@@ -13,7 +13,6 @@ const App = () => {
     const [loading, setLoding] = useState(false);
     const [form] = Form.useForm();
     const handleChange = ({ fileList: newFileList }) => {
-        console.log(newFileList)
         setFileList(newFileList)
     }
     const uploadButton = (
@@ -163,7 +162,7 @@ const App = () => {
                             >
                                 <Upload
                                     accept='image/*'
-                                    action="http://localhost:3000/upload"
+                                    action={`${pathServer}/upload`}
                                     listType="picture-circle"
                                     fileList={fileList}
                                     onChange={handleChange}
