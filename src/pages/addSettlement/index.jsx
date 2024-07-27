@@ -6,7 +6,7 @@ import { contentStyle, headerStyle, layoutStyle, footerStyle, titleStyle, projec
 const { TextArea } = Input;
 const { Header, Footer, Content } = Layout;
 const regex = /^\d{6}-\d{15}$/;
-const pathServer = 'http://localhost:3000'
+const pathServer = 'http://47.99.132.17/:3000'
 
 const App = () => {
     const [fileList, setFileList] = useState([]);

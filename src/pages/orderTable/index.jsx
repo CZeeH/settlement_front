@@ -6,7 +6,7 @@ import {
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { headerStyle, contentStyle, layoutStyle, headerRowStyle } from './static';
 const { Header, Content } = Layout;
-const pathServer = 'http://localhost:3000'
+const pathServer = 'http://47.99.132.17:3000'
 
 const OrderTable = () => {
     const [data, setData] = useState([]);// 页面数据
