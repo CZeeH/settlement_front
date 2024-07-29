@@ -182,7 +182,7 @@ const OrderTable = () => {
             dataIndex: 'isPay',
             key: 'isPay',
             render: (v, record) => (
-                v ? (
+                v === '1' ? (
                     <>
                         <Tag color="success">已结算</Tag>
                         <div />
