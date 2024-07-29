@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Button, Form, Input, Flex, Layout, Cascader, Upload, Space, Modal,Alert } from 'antd';
+import { Button, Form, Input, Flex, Layout, Cascader, Upload, Space, Modal, Alert } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { contentStyle, headerStyle, layoutStyle, footerStyle, titleStyle, projectData } from './static'
 
 const { TextArea } = Input;
 const { Header, Footer, Content } = Layout;
 const regex = /^\d{6}-\d{15}$/;
-const pathServer = 'http://47.99.132.17:3000'
+import { pathServer } from '../../common'
 
 const App = () => {
     const [fileList, setFileList] = useState([]);
@@ -34,8 +34,8 @@ const App = () => {
         </button>
     );
     const onFinish = async (values) => {
-        console.log('values',values)
-        const settlementMsg = { ...values, payment_picture: values.payment_picture.file.response.fileurl,isPay:'0' }
+        console.log('values', values)
+        const settlementMsg = { ...values, payment_picture: values.payment_picture.file.response.fileurl, isPay: '0' }
         setLoding(true)
         fetch(`${pathServer}/submit`, {
             method: 'POST',
@@ -168,7 +168,7 @@ const App = () => {
                                     onChange={handleChange}
                                     maxCount={1}
                                     name='paymentCode'
-                                    // beforeUpload={beforeUpload}
+                                // beforeUpload={beforeUpload}
                                 >
                                     {fileList.length >= 1 ? null : uploadButton}
                                 </Upload>

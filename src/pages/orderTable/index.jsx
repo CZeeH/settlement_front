@@ -6,7 +6,7 @@ import {
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { headerStyle, contentStyle, layoutStyle, headerRowStyle } from './static';
 const { Header, Content } = Layout;
-const pathServer = 'http://47.99.132.17:3000'
+import {pathServer} from '../../common'
 
 const OrderTable = () => {
     const [data, setData] = useState([]);// 页面数据
@@ -75,7 +75,8 @@ const OrderTable = () => {
         fetch(`${pathServer}/delete_record?${queryString}`).then(response => response.json())
             .then(res => {
                 res.success ? message.success(res.msg) : message.error(res.msg)
-                res.success && getData({}, current)
+                console
+                res.success && getData({}, pageCurrent)
             })
             .catch(error => {
                 setLoading(false)
@@ -98,7 +99,7 @@ const OrderTable = () => {
             .then(res => {
                 if (res.success) {
                     message.success('结算成功')
-                    getData({}, current)
+                    getData({}, pageCurrent)
                 } else {
                     message.error('结算失败，请检查')
                     setLoading(false)
