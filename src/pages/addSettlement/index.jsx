@@ -35,7 +35,7 @@ const App = () => {
     );
     const onFinish = async (values) => {
         console.log('values', values)
-        const settlementMsg = { ...values, payment_picture: values.payment_picture.file.response.fileurl, isPay: '0' }
+        const settlementMsg = { ...values, payment_picture: values.payment_picture.file.response.fileurl, isPay: '0',add_time:Date.now() }
         setLoding(true)
         fetch(`${pathServer}/submit`, {
             method: 'POST',
