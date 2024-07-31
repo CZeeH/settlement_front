@@ -136,7 +136,7 @@ const App = () => {
                                         {
                                             required: true,
                                             message: '请输入对应报酬(数字)',
-                                            pattern: /^\d{1,3}$/
+                                            pattern: /^\d{1,3}.\d{1,2}$/
                                         },
                                     ]}
                                 >
