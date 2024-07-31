@@ -161,7 +161,7 @@ const OrderTable = () => {
             title: '订单号（点击可复制）',
             dataIndex: 'order_id',
             key: 'order_id',
-            render: (v, vs) => (
+            render: (v, record) => (
                 <div className='m-0'>
                     <CopyToClipboard text={v} onCopy={info}>
                         <Button type="text">{v}</Button>
@@ -175,10 +175,10 @@ const OrderTable = () => {
             dataIndex: 'project',
             key: 'project',
             width: 260,
-            render: (v, vs) => (
+            render: (v, record) => (
                 <Flex justify={'center'} align={'center'} gap="small" wrap>
                     <Tag color="magenta">{v}</Tag>
-                    <Tag color="red">{vs.price}元</Tag>
+                    <Tag color="red">{record.price}元</Tag>
                 </Flex>
             )
         },
@@ -187,11 +187,11 @@ const OrderTable = () => {
             dataIndex: 'isPay',
             key: 'isPay',
             width: 150,
-            render: (v, vs) => (
+            render: (v, record) => (
                 v === '1' ? (
                     <Flex justify={'center'} align={'center'} gap="small" wrap>
-                        <CopyToClipboard text={vs.wx_number} onCopy={info}>
-                            <Tag color="blue">{vs.wx_number}</Tag>
+                        <CopyToClipboard text={record.wx_number} onCopy={info}>
+                            <Tag color="blue">{record.wx_number}</Tag>
                         </CopyToClipboard>
                         <Tag color="success">已结算</Tag>
                         <div />
@@ -201,14 +201,14 @@ const OrderTable = () => {
                     :
                     (
                         <Flex justify={'center'} align={'center'} gap="small" vertical>
-                            <CopyToClipboard text={vs.wx_number} onCopy={info}>
-                                <Tag.CheckableTag color="blue">{vs.wx_number}</Tag.CheckableTag>
+                            <CopyToClipboard text={record.wx_number} onCopy={info}>
+                                <Tag.CheckableTag color="blue">{record.wx_number}</Tag.CheckableTag>
                             </CopyToClipboard>
                             <Popover placement="right" content={() => (
                                 <Image
                                     width={300}
                                     height={405}
-                                    src={vs.payment_picture}
+                                    src={record.payment_picture}
                                 />
                             )} >
                                 <Button type="primary" onClick={() => settlement(record)}>
