@@ -1,21 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Table, Tag, Image, Button, message, Layout, Row, Col,Space,
-    Spin, Input, Modal, InputNumber, Form, Pagination, Select, Divider
+    Table, Tag, Image, Button, message, Layout, Row, Col, Space,
+    Spin, Input, Modal, InputNumber, Form, Pagination, Select, Divider,
+    Flex, Popover, FloatButton
 } from 'antd';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { headerStyle, contentStyle, layoutStyle, headerRowStyle } from './static';
 const { Header, Content } = Layout;
-import {pathServer} from '../../common'
+import { pathServer } from '../../common'
 
 const OrderTable = () => {
     const [data, setData] = useState([]);// 页面数据
     const [loading, setLoading] = useState(false); //页面loading
-    const [imageLen, setImageLen] = useState(150); // 设置图片显示大小
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [open, setOpen] = useState(false); // modal 开关
     const [modalValues, seModalValues] = useState({}); // modal 开关
     const [pageTotals, setPageTotals] = useState(10);
     const [pageCurrent, setPageCurrent] = useState(1);
+    const [batchPrice, setBatchPrice] = useState(0); // 批量结算总金额
 
     const [form] = Form.useForm();
     const [formTable] = Form.useForm();
@@ -37,6 +39,20 @@ const OrderTable = () => {
         setPageCurrent(page)
         getData({}, (page - 1) * pageSize, pageSize)
     };
+
+    const onSelectChange = (newSelectedRowKeys, records) => {
+        setSelectedRowKeys(newSelectedRowKeys);
+        let sum = 0
+        records.forEach(element => {
+            sum += Number(element.price)
+        });
+        setBatchPrice(sum)
+    };
+    const rowSelection = {
+        selectedRowKeys,
+        onChange: onSelectChange,
+    };
+    const hasSelected = selectedRowKeys.length > 0;
 
     /**请求列表数据 */
     const getData = (query, skip = 0, limit = 10) => {
@@ -145,68 +161,63 @@ const OrderTable = () => {
             title: '订单号（点击可复制）',
             dataIndex: 'order_id',
             key: 'order_id',
-            render: (v) => (
-                <CopyToClipboard text={v} onCopy={info}>
-                    <Button type="text">{v}</Button>
-                </CopyToClipboard>
+            render: (v, vs) => (
+                <div className='m-0'>
+                    <CopyToClipboard text={v} onCopy={info}>
+                        <Button type="text">{v}</Button>
+                    </CopyToClipboard>
+
+                </div>
             )
         },
         {
-            title: '接单人微信号',
-            dataIndex: 'wx_number',
-            key: 'wx_number',
-            render: (v) => (
-                <CopyToClipboard text={v} onCopy={info}>
-                    <Button type="text">{v}</Button>
-                </CopyToClipboard>
-            )
-        },
-        {
-            title: '陪玩项目',
+            title: '项目/价格',
             dataIndex: 'project',
             key: 'project',
-            render: (v) => {
-                return (v)
-            }
-        },
-        {
-            title: '价格',
-            dataIndex: 'price',
-            key: 'price',
-            render: (v) => (
-                <Tag color="red">{v}元</Tag>
+            width: 260,
+            render: (v, vs) => (
+                <Flex justify={'center'} align={'center'} gap="small" wrap>
+                    <Tag color="magenta">{v}</Tag>
+                    <Tag color="red">{vs.price}元</Tag>
+                </Flex>
             )
         },
         {
-            title: '是否结算',
+            title: '是否结算 / 微信号',
             dataIndex: 'isPay',
             key: 'isPay',
-            render: (v, record) => (
+            width: 150,
+            render: (v, vs) => (
                 v === '1' ? (
-                    <>
+                    <Flex justify={'center'} align={'center'} gap="small" wrap>
+                        <CopyToClipboard text={vs.wx_number} onCopy={info}>
+                            <Tag color="blue">{vs.wx_number}</Tag>
+                        </CopyToClipboard>
                         <Tag color="success">已结算</Tag>
                         <div />
                         <Tag color="success">结算时间：{record.settlementTime}</Tag>
-                    </>
+                    </Flex>
                 )
                     :
                     (
-                        <>
-                            <Button type="primary" onClick={() => settlement(record)}>点击结算</Button>
-                        </>
+                        <Flex justify={'center'} align={'center'} gap="small" vertical>
+                            <CopyToClipboard text={vs.wx_number} onCopy={info}>
+                                <Tag.CheckableTag color="blue">{vs.wx_number}</Tag.CheckableTag>
+                            </CopyToClipboard>
+                            <Popover placement="right" content={() => (
+                                <Image
+                                    width={300}
+                                    height={405}
+                                    src={vs.payment_picture}
+                                />
+                            )} >
+                                <Button type="primary" onClick={() => settlement(record)}>
+                                    结算
+                                </Button>
+                            </Popover>
+
+                        </Flex>
                     )
-            )
-        },
-        {
-            title: '收款码',
-            dataIndex: 'payment_picture',
-            key: 'payment_picture',
-            render: (v) => (
-                <Image
-                    width={imageLen}
-                    height={imageLen}
-                    src={v}
-                />
             )
         },
         {
@@ -215,16 +226,14 @@ const OrderTable = () => {
             key: 'remark',
         },
         {
-            title: '详情',
-            dataIndex: 'detail',
-            key: 'detail',
-        },
-        {
             title: '操作',
             dataIndex: 'actions',
             key: 'actions',
             render: (_, record) => (
                 <Button.Group>
+                    <Popover content={record.detail} title='详情'>
+                        <Button type="primary">详情</Button>
+                    </Popover>
                     <Button type="primary" onClick={() => showModal(record)}>结算并备注</Button>
                     <Button type="primary" onClick={() => deleteRecord(record)}>删除</Button>
                 </Button.Group>
@@ -240,6 +249,21 @@ const OrderTable = () => {
     const resetParam = () => {
         formTable.resetFields()
         getData()
+    }
+
+    const batchSettlement = () => {
+        selectedRowKeys
+        // const values = form.getFieldsValue(true)
+        // updateFetch(
+        //     { order_id: values.order_id },
+        //     {
+        //         isPay: '1',
+        //         settlementTime: (new Date()).toLocaleString(),
+        //         price: values.price,
+        //         remark: values.remark
+        //     },
+        //     handleCancel
+        // )
     }
 
     return (
@@ -272,7 +296,7 @@ const OrderTable = () => {
                             <Form.Item
                                 label="结算状态"
                                 name="isPay"
-                            > 
+                            >
                                 <Select
                                     defaultValue={undefined}
                                     style={{ width: 120 }}
@@ -281,6 +305,20 @@ const OrderTable = () => {
                                         { value: '0', label: '未结算' },
                                     ]}
                                 />
+                            </Form.Item>
+                        </Col>
+                        <Col span={5}>
+                            <Form.Item
+                                label="微信号"
+                                name="wx_number"
+                                rules={[
+                                    {
+                                        required: false,
+                                        message: 'Please input 微信号',
+                                    },
+                                ]}
+                            >
+                                <Input />
                             </Form.Item>
                         </Col>
                         <Col span={4}>
@@ -301,7 +339,11 @@ const OrderTable = () => {
             </Header>
             <Spin spinning={loading}>
                 <Content style={contentStyle}>
-
+                    <Flex align="center" gap="small">
+                        <Button type="primary" onClick={batchSettlement} disabled={!hasSelected} loading={loading}>
+                            批量结算 总金额：{batchPrice}
+                        </Button>
+                    </Flex>
                     <Table
                         dataSource={data}
                         columns={columns}
@@ -309,8 +351,10 @@ const OrderTable = () => {
                         pagination={false}
                         showHeader
                         bordered
+                        rowSelection={rowSelection}
                     />
                     <Pagination
+                        align="center"
                         defaultCurrent={1}
                         total={pageTotals}
                         current={pageCurrent}
@@ -380,6 +424,11 @@ const OrderTable = () => {
                         >
                             <Input />
                         </Form.Item>
+                        <Image
+                            width={300}
+                            height={405}
+                            src={modalValues.payment_picture}
+                        />
                     </Form>
                 </Modal>
             </Spin>

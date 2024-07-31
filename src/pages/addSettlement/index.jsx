@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Form, Input, Flex, Layout, Cascader, Upload, Space, Modal, Alert } from 'antd';
+import { Button, Form, Input, Flex, Popover, Layout, Cascader, Upload, Space, Modal, Alert } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { contentStyle, headerStyle, layoutStyle, footerStyle, titleStyle, projectData } from './static'
 
@@ -35,7 +35,7 @@ const App = () => {
     );
     const onFinish = async (values) => {
         console.log('values', values)
-        const settlementMsg = { ...values, payment_picture: values.payment_picture.file.response.fileurl, isPay: '0',add_time:Date.now() }
+        const settlementMsg = { ...values, payment_picture: values.payment_picture.file.response.fileurl, isPay: '0', add_time: Date.now() }
         setLoding(true)
         fetch(`${pathServer}/submit`, {
             method: 'POST',
@@ -68,14 +68,6 @@ const App = () => {
         console.log('Failed:', errorInfo);
     };
 
-    // const beforeUpload = (file) => {
-    //     const isLt2M = file.size / 1024 / 1024 < 2;
-    //     if (!isLt2M) {
-    //         message.error('图片太大了 必须小于2MB!');
-    //       }
-    //     return isLt2M
-    // }
-
     return (
         <>
             <Flex gap="middle" wrap >
@@ -84,7 +76,7 @@ const App = () => {
                         <div style={titleStyle}>icon订单结算</div>
                     </Header>
                     <Alert message="7月29日之后完成的单子填这里，文档填过的不用再填，团长微信：SKY-777A，每周日周一结算" type="info" />
-                    <Alert message="王者技术陪：2元一把 王者娱乐陪：1元1把 光遇普陪：2.5元/小时 光遇三恋陪：6元/小时 蛋仔普陪：2元/h 蛋仔技术陪：4.5元/h" type="success" />
+                    <Alert message="光遇普陪：2.5元/小时 光遇三恋陪：6元/小时 王者技术陪：1.5元一把 王者娱乐陪：0.8元一把 蛋仔技术陪：4元/小时 蛋仔普陪：2元/小时" type="success" />
                     <Content style={contentStyle}>
                         <Form
                             name="basic"
@@ -124,7 +116,7 @@ const App = () => {
                                 <Input />
                             </Form.Item>
                             <Form.Item
-                                label="陪玩项目"
+                                label="实际陪玩项目与时间"
                                 name="project"
                                 rules={[
                                     {
@@ -137,19 +129,19 @@ const App = () => {
                                     options={projectData}
                                 />
                             </Form.Item>
-                            <Form.Item
-                                label="报酬"
-                                name="price"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: '请输入对应报酬(数字)',
-                                        pattern: /^\d{1,3}$/
-                                    },
-                                ]}
-                            >
-                                <Input />
-                            </Form.Item>
+                                <Form.Item
+                                    label="报酬"
+                                    name="price"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: '请输入对应报酬(数字)',
+                                            pattern: /^\d{1,3}$/
+                                        },
+                                    ]}
+                                >
+                                    <Input />
+                                </Form.Item>
                             <Form.Item
                                 label="收款码"
                                 name="payment_picture"

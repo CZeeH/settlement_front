@@ -34,6 +34,11 @@ const headerRowStyle = {
     width: '100%'
 }
 
+const midStyle = {
+    width:'100%',
+    margin: '0 auto'
+}
+
 export {
-    headerStyle,contentStyle,footerStyle,layoutStyle,headerRowStyle
+    headerStyle,contentStyle,footerStyle,layoutStyle,headerRowStyle,midStyle
 }
