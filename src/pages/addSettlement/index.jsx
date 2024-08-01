@@ -76,7 +76,7 @@ const App = () => {
                         <div style={titleStyle}>icon订单结算</div>
                     </Header>
                     <Alert message="7月29日之后完成的单子填这里，文档填过的不用再填，团长微信：SKY-777A，每周日周一结算" type="info" />
-                    <Alert message="光遇普陪：2.5元/小时 光遇三恋陪：6元/小时 王者技术陪：1.5元一把 王者娱乐陪：0.8元一把 蛋仔技术陪：4元/小时 蛋仔普陪：2元/小时" type="success" />
+                    <Alert message="光遇普陪：2.5元/小时 光遇三恋陪：6元/小时 王者技术陪：1.7元一把 王者娱乐陪：0.8元一把 蛋仔技术陪：4元/小时 蛋仔普陪：2元/小时" type="success" />
                     <Content style={contentStyle}>
                         <Form
                             name="basic"

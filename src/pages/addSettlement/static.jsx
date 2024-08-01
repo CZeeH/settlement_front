@@ -53,31 +53,31 @@ const projectData = [
                 children: [
                     {
                         value: '7局',
-                        label: '7局(10.5元)',
+                        label: '7局(11.9元)',
                     },
                     {
                         value: '6局',
-                        label: '6局(9元)',
+                        label: '6局(10.2元)',
                     },
                     {
                         value: '5局',
-                        label: '5局(7.5元)',
+                        label: '5局(8.5元)',
                     },
                     {
                         value: '4局',
-                        label: '4局(6元)',
+                        label: '4局(6.8元)',
                     },
                     {
                         value: '3局',
-                        label: '3局(4.5元)',
+                        label: '3局(5.1元)',
                     },
                     {
                         value: '2局',
-                        label: '2局(3元)',
+                        label: '2局(3.4元)',
                     },
                     {
                         value: '1局',
-                        label: '1局(1.5元)',
+                        label: '1局(1.7元)',
                     },
                 ]
             },

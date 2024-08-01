@@ -79,13 +79,13 @@ const OrderTable = () => {
                 message.error(error)
             });
     }
+    
     /**更新数据 */
     const deleteFetch = async (order_id) => {
         setLoading(true)
         const params = {
             order_id
         };
-
         // 构建查询字符串
         const queryString = new URLSearchParams(params).toString();
         fetch(`${pathServer}/delete_record?${queryString}`).then(response => response.json())
@@ -105,6 +105,33 @@ const OrderTable = () => {
     const updateFetch = async (filter, updateDoc, cbFun = () => { }) => {
         setLoading(true)
         fetch(`${pathServer}/update_payment`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ filter, updateDoc })
+        })
+            .then(response => response.json())
+            .then(res => {
+                if (res.success) {
+                    message.success('结算成功')
+                    getData({}, pageCurrent)
+                } else {
+                    message.error('结算失败，请检查')
+                    setLoading(false)
+                }
+            })
+            .catch(error => Modal.error({
+                content: error
+            }))
+            .finally(() => {
+                cbFun()
+            })
+    }
+    /**批量更新 */
+    const batchUpdateFetch = async (filter, updateDoc, cbFun = () => { }) => {
+        setLoading(true)
+        fetch(`${pathServer}/batch_update`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -252,18 +279,11 @@ const OrderTable = () => {
     }
 
     const batchSettlement = () => {
-        selectedRowKeys
-        // const values = form.getFieldsValue(true)
-        // updateFetch(
-        //     { order_id: values.order_id },
-        //     {
-        //         isPay: '1',
-        //         settlementTime: (new Date()).toLocaleString(),
-        //         price: values.price,
-        //         remark: values.remark
-        //     },
-        //     handleCancel
-        // )
+        const filter = []
+        selectedRowKeys.forEach((selectedRowKey) => (
+            filter.push({ order_id: selectedRowKey })
+        ))
+        batchUpdateFetch(filter, { isPay: '1', settlementTime: (new Date()).toLocaleString() })
     }
 
     return (
