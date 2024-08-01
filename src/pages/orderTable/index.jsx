@@ -141,10 +141,11 @@ const OrderTable = () => {
             .then(response => response.json())
             .then(res => {
                 if (res.success) {
-                    message.success('结算成功')
-                    getData({}, pageCurrent)
+                    message.success('批量结算成功')
+                    getData(formTable.getFieldsValue(true), pageCurrent)
+                    setSelectedRowKeys([])
                 } else {
-                    message.error('结算失败，请检查')
+                    message.error('批量结算失败，请检查')
                     setLoading(false)
                 }
             })
@@ -280,10 +281,11 @@ const OrderTable = () => {
 
     const batchSettlement = () => {
         const filter = []
-        selectedRowKeys.forEach((selectedRowKey) => (
+        const updateDoc = { isPay: '1', settlementTime: (new Date()).toLocaleString() }
+        selectedRowKeys.forEach((selectedRowKey) => {
             filter.push({ order_id: selectedRowKey })
-        ))
-        batchUpdateFetch(filter, { isPay: '1', settlementTime: (new Date()).toLocaleString() })
+    })
+        batchUpdateFetch(filter, updateDoc)
     }
 
     return (
