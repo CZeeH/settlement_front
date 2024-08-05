@@ -33,19 +33,25 @@ const OrderTable = () => {
         seModalValues(value)
     };
     const handleCancel = () => {
+        form.resetFields()
         setOpen(false);
     };
     const onPageChange = (page, pageSize) => {
         setPageCurrent(page)
-        getData({}, (page - 1) * pageSize, pageSize)
+        getData(formTable.getFieldsValue(true), (page - 1) * pageSize, pageSize)
     };
 
     const onSelectChange = (newSelectedRowKeys, records) => {
-        setSelectedRowKeys(newSelectedRowKeys);
+        console.log(newSelectedRowKeys)
         let sum = 0
+        let newKeys = []
         records.forEach(element => {
-            sum += Number(element.price)
+            if (element.isPay === '0') {
+                sum += Number(element.price)
+                newKeys.push(element.order_id)
+            }
         });
+        setSelectedRowKeys(newKeys);
         setBatchPrice(sum)
     };
     const rowSelection = {
@@ -115,7 +121,7 @@ const OrderTable = () => {
             .then(res => {
                 if (res.success) {
                     message.success('结算成功')
-                    getData({}, pageCurrent)
+                    getData(formTable.getFieldsValue(true), pageCurrent)
                 } else {
                     message.error('结算失败，请检查')
                     setLoading(false)
@@ -144,6 +150,7 @@ const OrderTable = () => {
                     message.success('批量结算成功')
                     getData(formTable.getFieldsValue(true), pageCurrent)
                     setSelectedRowKeys([])
+                    setBatchPrice(0)
                 } else {
                     message.error('批量结算失败，请检查')
                     setLoading(false)
@@ -276,6 +283,8 @@ const OrderTable = () => {
 
     const resetParam = () => {
         formTable.resetFields()
+        setSelectedRowKeys([])
+        setBatchPrice(0)
         getData()
     }
 

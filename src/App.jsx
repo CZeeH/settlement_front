@@ -1,7 +1,9 @@
 import { BrowserRouter as Router, Route, Routes,HashRouter } from 'react-router-dom'
-import OrderTable from './pages/orderTable/index'
+import SettlementList from './pages/settlementList/index'
 import NotFound from './pages/notFound/index';
-import addSettlement from './pages/addSettlement/index';
+import AddSettlement from './pages/addSettlement/index';
+import PickOne from './pages/pickOne/index'
+import OrderList from './pages/orderList/index'
 import './App.css'
 
 const App = () => {
@@ -9,8 +11,10 @@ const App = () => {
     <>
       <HashRouter>
         <Routes>
-          <Route path="/order_table" element={OrderTable()} />
-          <Route path="/" element={addSettlement()} />
+          <Route path="/settlement_list" element={SettlementList()} />
+          <Route path="/order_list" element={OrderList()} />
+          <Route path="/pick" element={PickOne()} />
+          <Route path="/" element={AddSettlement()} />
           <Route path="*" element={NotFound()} />
         </Routes>
       </HashRouter>
