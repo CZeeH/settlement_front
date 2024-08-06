@@ -8,6 +8,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { headerStyle, contentStyle, layoutStyle, headerRowStyle } from './static';
 const { Header, Content } = Layout;
 import { pathServer } from '../../common'
+import Big from 'big.js'
 
 const OrderTable = () => {
     const [data, setData] = useState([]);// 页面数据
@@ -42,17 +43,17 @@ const OrderTable = () => {
     };
 
     const onSelectChange = (newSelectedRowKeys, records) => {
-        console.log(newSelectedRowKeys)
-        let sum = 0
+        let sum = new Big('0')
         let newKeys = []
         records.forEach(element => {
             if (element.isPay === '0') {
-                sum += Number(element.price)
+                sum = sum.plus(new Big(element.price))
+                console.log(sum)
                 newKeys.push(element.order_id)
             }
         });
         setSelectedRowKeys(newKeys);
-        setBatchPrice(sum)
+        setBatchPrice(sum.toFixed(2))
     };
     const rowSelection = {
         selectedRowKeys,
@@ -97,7 +98,6 @@ const OrderTable = () => {
         fetch(`${pathServer}/delete_record?${queryString}`).then(response => response.json())
             .then(res => {
                 res.success ? message.success(res.msg) : message.error(res.msg)
-                console
                 res.success && getData({}, pageCurrent)
             })
             .catch(error => {
@@ -278,6 +278,9 @@ const OrderTable = () => {
 
     const search = () => {
         const values = formTable.getFieldsValue(true)
+        setSelectedRowKeys([])
+        setBatchPrice(0)
+        setPageCurrent(1)
         getData(values)
     }
 
@@ -285,6 +288,7 @@ const OrderTable = () => {
         formTable.resetFields()
         setSelectedRowKeys([])
         setBatchPrice(0)
+        setPageCurrent(1)
         getData()
     }
 
