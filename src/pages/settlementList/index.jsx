@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
     Table, Tag, Image, Button, message, Layout, Row, Col, Space,
     Spin, Input, Modal, InputNumber, Form, Pagination, Select, Divider,
-    Flex, Popover, FloatButton
+    Flex, Popover
 } from 'antd';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { headerStyle, contentStyle, layoutStyle, headerRowStyle } from './static';
@@ -23,7 +23,9 @@ const OrderTable = () => {
     const [form] = Form.useForm();
     const [formTable] = Form.useForm();
     useEffect(() => {
-        getData()
+        if (location.hash === '#/settlement_list') {
+            getData()
+        }
     }, []); // 仅在 count 发生变化时执行
     // 复制通知
     const info = () => {
