@@ -9,7 +9,8 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 const order_status = {
   unSubmitted: '1', // 未提交信息，表单页面
   submitted: '2', // 提交信息了 匹配页面 就是 unAssigned
-  wrongCode: '0' // key没有输入或者输入错误，显示提示页面
+  wrongCode: '0', // key没有输入或者输入错误，显示提示页面
+  Assigned: '3'
 }
 
 const info = () => {
@@ -296,7 +297,7 @@ const FormPage = () => {
           </>
         }
         {
-          pageStatus === order_status.submitted &&
+          [order_status.submitted,order_status.Assigned].includes(pageStatus) &&
           (
             <>
               <Flex gap="middle" align="center" vertical>
