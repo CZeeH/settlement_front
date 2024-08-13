@@ -1,16 +1,71 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Badge, Button, Radio, Flex, Descriptions, message, Result, Spin, Alert,Image } from 'antd';
-import { connectMan } from './static'
 import clipboardCopy from 'clipboard-copy';
 import { pathServer } from '../../common'
 import { useLocation } from 'react-router-dom';
 import queryString from 'query-string';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 const order_status = {
   unSubmitted: '1', // 未提交信息，表单页面
   submitted: '2', // 提交信息了 匹配页面 就是 unAssigned
   wrongCode: '0' // key没有输入或者输入错误，显示提示页面
 }
+
+const info = () => {
+  message.success('复制成功')
+}
+
+const connectMan = [
+  {
+    key: '5',
+    label: '对接扣扣群',
+    children: (
+      <div className='des_image'>
+        <h3 >老板，扫码进群对接陪陪/代练</h3>
+        <Image
+          width={330}
+          height='auto'
+          alt='扫码进群'
+          src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024813-payment-Iaw8Tr20QjXN.jpg'
+        />
+      </div>
+    )
+  },
+  {
+    key: '1',
+    label: '联系微信',
+    children: (
+      <CopyToClipboard text='SKY-777A' onCopy={info}>
+        <Button type="dashed" color=''>SKY-777A</Button>
+      </CopyToClipboard>
+    ),
+  },
+  {
+    key: '2',
+    label: '联系qq群账号',
+    children: (
+      <CopyToClipboard text='885967844' onCopy={info}>
+        <Button type="dashed" color=''>885967844</Button>
+      </CopyToClipboard>
+    ),
+  },
+  {
+    key: '6',
+    label: '案例参考',
+    children: (
+      <div className='des_image'>
+        <h3 >扫码进群对接陪陪/代练</h3>
+        <Image
+                  width={330}
+                  height='auto'
+                  alt='指导'
+                  src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024813-payment-1RjuOYZoQbe4.jpg'
+                />
+      </div>
+    )
+  },
+]
 
 const FormPage = () => {
   const location = useLocation();
