@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Space, Table, Tag, Button, Flex, Modal, Form, Cascader, Input, Spin, Popover, message, Descriptions, Pagination } from 'antd';
+import { Space, Table, Tag, Button, Flex, Select, Col, Row, Modal, Form, Cascader, Input, Spin, Popover, message, Descriptions, Pagination } from 'antd';
 import { projectData, order_status } from './static'
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { pathServer } from '../../common'
@@ -26,7 +26,7 @@ const App = () => {
   const [pageTotals, setPageTotals] = useState(10);
   const [pageCurrent, setPageCurrent] = useState(1);
   const [form] = Form.useForm();
-  const [formSearch] = Form.useForm();
+  const [pageForm] = Form.useForm();
   useEffect(() => {
     getListData()
   }, [])
@@ -37,11 +37,15 @@ const App = () => {
   }
   const handleCopyDeatil = (data) => {
     const formattedText = `
+    【接单后先对接老板】老板在qq群，先进qq群 885967844 找老板
+
     [区服]:${data.origin}
     [游戏项目]:${data.project}
     [游戏id/名字]:${data.game_id}
     [游戏段位]:${data.game_level}
     [订单号]:${data.order_id}
+
+    接单注意事项：非mvp主动联系老板上号代练
     `;
 
     clipboardCopy(formattedText)
@@ -79,7 +83,7 @@ const App = () => {
   }
 
   const handleFinishAssign = (id) => {
-    updateFetch({ order_id: id }, { order_status: order_status.Assigned })
+    updateFetch({ order_id: id }, { order_status: order_status.Assigned }, () => { getListData() })
   }
   const columns = [
     {
@@ -288,11 +292,60 @@ const App = () => {
     setPageCurrent(page)
     getListData(form.getFieldsValue(true), (page - 1) * pageSize, pageSize)
   };
-
+  
+  const search = () => {
+    const param = pageForm.getFieldsValue(true)
+    console.log('param',param)
+    message.success('暂未开放')
+  }
 
   return (
     <>
       <Spin spinning={loading}>
+        <Form
+          name="searchPage"
+          form={pageForm}
+          autoComplete="off"
+        >
+          <Row gutter={10}>
+            <Col span={7}>
+              <Form.Item
+                label="订单号"
+                name="order_id"
+                rules={[
+                  {
+                    required: false,
+                    message: '请输入正确的订单号',
+                    pattern: regex
+                  }
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={4}>
+              <Form.Item
+                label="订单状态"
+                name="order_status"
+              >
+                <Select
+                  defaultValue={undefined}
+                  style={{ width: 120 }}
+                  options={[
+                    { value: '1', label: '等待填单' },
+                    { value: '2', label: '等待匹配' },
+                    { value: '3', label: '匹配完成' },
+                  ]}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={5}>
+              <Button type="primary"  onClick={() => { search() }}>搜索</Button>
+            </Col>
+          </Row>
+        </Form>
+
+
         <Flex gap="small" wrap>
           <Button type="primary" onClick={openModal}>新单创建</Button>
           <Button onClick={() => { getListData() }}>刷新订单状态</Button>
