@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Badge, Button, Radio, Flex, Descriptions, message, Result, Spin } from 'antd';
+import { Form, Input, Badge, Button, Radio, Flex, Descriptions, message, Result, Spin, Alert,Image } from 'antd';
 import { connectMan } from './static'
 import clipboardCopy from 'clipboard-copy';
 import { pathServer } from '../../common'
@@ -247,15 +247,16 @@ const FormPage = () => {
               <Flex gap="middle" align="center" vertical>
                 {/* <div style={{ padding: '20px', backgroundColor: '#f0f2f5' }}>
                 订单匹配中，亲亲稍等5分钟左右，在这里可以看到陪陪信息
-              </div> */}
+                </div> */}
                 <Descriptions
                   title="您的订单信息"
                   size='small'
-                  extra={<Button type="primary" onClick={handleCopyClick}>一键复制</Button>}
+                  extra={<Button type="primary" onClick={handleCopyClick}>一键复制对接信息</Button>}
                   bordered
                   // borderRadius
                   items={descriptionsDetailForMe}
                 />
+                <Alert message="操作步骤： 第一：点击右上角 ”一键复制对接信息“按钮 ，第二步扫qq群码进去粘贴内容对接完成！" type="success" />
 
                 <Descriptions
                   title="对接陪玩信息"

@@ -4,6 +4,7 @@ import NotFound from './pages/notFound/index';
 import AddSettlement from './pages/addSettlement/index';
 import PickOne from './pages/pickOne/index';
 import OrderList from './pages/orderList/index';
+import CheckSettlement from './pages/checkSettlement/index'
 import './App.css';
 
 const App = () => {
@@ -11,6 +12,7 @@ const App = () => {
     <HashRouter>
       <Routes>
         <Route path="/settlement_list" element={<SettlementList />} />
+        <Route path="/check_settlement" element={<CheckSettlement />} />
         <Route path="/order_list" element={<OrderList />} />
         <Route path="/pick" element={<PickOne />} />
         <Route path="/" element={<AddSettlement />} />
