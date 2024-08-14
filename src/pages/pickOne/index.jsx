@@ -181,9 +181,9 @@ const FormPage = () => {
     [区服]:${data.origin}\n
     [游戏项目]:${data.project}\n
     [游戏id/名字]:${data.game_id}\n
-    [游戏段位]:${data.game_level}\n
+    [游戏段位]:${data.game_level || ''}\n
     [订单号]:${data.order_id}\n
-    [备注]:${data.remark}\n
+    [备注]:${data.remark || ''}\n
     `;
 
     clipboardCopy(formattedText)
@@ -223,14 +223,6 @@ const FormPage = () => {
     ]
     setDescriptionsDetailForMe(items)
   }
-
-  const contentStyle = {
-    height: '160px',
-    color: '#fff',
-    lineHeight: '160px',
-    textAlign: 'center',
-    background: '#364d79',
-  };
 
   return (
     <>
@@ -285,7 +277,7 @@ const FormPage = () => {
                   name="game_level"
                   rules={[{ required: true, message: '请选择陪玩项目!' }]}
                 >
-                  <Input placeholder="例如：王者荣耀： 钻石三 或者 蛋仔2100分" />
+                  <Input placeholder="例如：王者荣耀： 钻石三 或者 蛋仔2100分  光遇填无" />
                 </Form.Item>
                 <Form.Item
                   label="备注"
@@ -310,24 +302,27 @@ const FormPage = () => {
                   </Button>
                 </Form.Item>
               </Form>
-              <Carousel autoplay infinite={false} arrows>
-                <div>
-                  <Image src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024814-payment-wXFbiFyNI5Q7.jpg'  width={200}
-          height='auto'  />                
+              <div>
+                <Carousel autoplay infinite={false} arrows>
+                  <div>
+                    <Image src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024814-payment-wXFbiFyNI5Q7.jpg' width={200}
+                      height='auto' />
                   </div>
                   <div>
-                  <Image src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024814-payment-N8olMo2v2J22.jpg'  width={200}
-          height='auto'  />                
-                  </div>
-                <div>
-                  <Image src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024814-payment-M49ExS9vbHBv.jpg'  width={200}
-          height='auto'  />                
+                    <Image src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024814-payment-N8olMo2v2J22.jpg' width={200}
+                      height='auto' />
                   </div>
                   <div>
-                  <Image src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024814-payment-HUUDe5iTFpCs.jpg'  width={200}
-          height='auto'  />                
+                    <Image src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024814-payment-M49ExS9vbHBv.jpg' width={200}
+                      height='auto' />
                   </div>
-              </Carousel>
+                  <div>
+                    <Image src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024814-payment-HUUDe5iTFpCs.jpg' width={200}
+                      height='auto' />
+                  </div>
+                </Carousel>
+              </div>
+
             </div>
           </>
         }

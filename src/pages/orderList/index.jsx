@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Space, Table, Tag, Button, Flex, Select, Col, Row, Modal, Form, Cascader, Input, Spin, Popover, message, Descriptions, Pagination } from 'antd';
+import { Space, Table, Tag, Button, Flex, Select, Col, Row, Modal, Form, Cascader,
+   Input, Spin, Popover, message, Descriptions, Pagination } from 'antd';
 import { projectData, order_status } from './static'
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { pathServer } from '../../common'
@@ -28,6 +29,7 @@ const App = () => {
   const [form] = Form.useForm();
   const [pageForm] = Form.useForm();
   useEffect(() => {
+    getListData()
     const intervalId = setInterval(() => {
       getListData()
     }, 20000); // 60000 毫秒 = 1 分钟
@@ -106,61 +108,77 @@ const App = () => {
       title: '订单状态',
       dataIndex: 'order_status',
       key: 'order_status',
-      render: (v) => {
+      render: (v,record) => {
         switch (v) {
           case order_status.unAssigned:
-            return <Tag icon={<SyncOutlined spin />} color="processing">等待分配陪玩</Tag>
+            return (
+              <Flex >
+                    <Tag icon={<SyncOutlined spin />} color="processing">等待分配陪玩</Tag>
+                   <div style={{padding:10}}>
+                    <Tag color="processing" >{record.project}</Tag>
+                   </div>
+                </Flex>
+            )
           case order_status.Assigned:
-            return <Tag icon={<CheckCircleOutlined />} color="success">订单分配完毕</Tag>
+            return (
+              <>
+               <Tag icon={<CheckCircleOutlined />} color="success">订单分配完毕</Tag>
+               <Tag color="success">{record.project}</Tag>
+              </>
+          )
           default:
-            return <Tag icon={<ClockCircleOutlined spin />} color="default">
-              等待用户填单
-            </Tag>
+            return (
+              <>
+              <Tag icon={<ClockCircleOutlined spin />} color="default">等待用户填单</Tag>
+              <Tag color="default">{record.project}</Tag>
+              </>
+            
+            )
         }
       }
     },
-    {
-      title: '下单时间',
-      dataIndex: 'add_time',
-      key: 'add_time',
-      render: (v) => {
-        let date = new Date(v);
-        return date.toLocaleString()
-      }
-    },
-    {
-      title: '订单详情(点击可复制)',
-      dataIndex: 'project',
-      key: 'project',
-      render: (value, record) => {
-        const formattedText = `
-        【接单后先对接老板】老板在qq群，qq群：885967844\n
+    // {
+    //   title: '下单时间',
+    //   dataIndex: 'add_time',
+    //   key: 'add_time',
+    //   render: (v) => {
+    //     let date = new Date(v);
+    //     return date.toLocaleString()
+    //   }
+    // },
+    // {
+    //   title: '订单详情(点击可复制)',
+    //   dataIndex: 'project',
+    //   key: 'project',
+    //   render: (value, record) => {
+    //     const formattedText = `
+    //     【接单后先对接老板】老板在qq群，qq群：885967844\n
 
-    [区服]:${record.origin}\n
-    [游戏项目]:${record.project}\n
-    [游戏id/名字]:${record.game_id}\n
-    [游戏段位]:${record.game_level}\n
-    [订单号]:${record.order_id}\n
-    [老板qq]:${record.qq_number}\n
+    // [区服]:${record.origin}\n
+    // [游戏项目]:${record.project}\n
+    // [游戏id/名字]:${record.game_id}\n
+    // [游戏段位]:${record.game_level}\n
+    // [订单号]:${record.order_id}\n
+    // [老板qq]:${record.qq_number}\n
 
-    接单注意事项：非mvp主动联系老板上号代练
-        `;
-        // [订单号]:${record.order_id}
-        return (
-          <>
-            {
-              [order_status.unAssigned, order_status.Assigned].includes(record.order_status) ?
-                (<Popover content={formattedText} title="订单详情（点击复制）" >
-                  <p onClick={() => { handleCopyDeatil(record) }}>{value}</p>
-                </Popover>)
-                :
-                (<p>{value}</p>)
-            }
+    // 接单注意事项：非mvp主动联系老板上号代练
+    //     `;
+    //     // [订单号]:${record.order_id}
+    //     return (
+    //       <>
+    //         {
+    //           [order_status.unAssigned, order_status.Assigned].includes(record.order_status) ?
+    //             (<Popover content={formattedText} title="订单详情（点击复制）" >
+    //               <p onClick={() => { handleCopyDeatil(record) }}>{value}</p>
+    //             </Popover>)
+    //             :
+    //             (<p>{value}</p>)
+    //         }
 
-          </>
-        )
-      }
-    },
+    //       </>
+    //     )
+    //   }
+    // },
     {
       title: '操作',
       key: 'action',
@@ -359,6 +377,7 @@ const App = () => {
         <Flex gap="small" wrap>
           <Button type="primary" onClick={openModal}>新单创建</Button>
           <Button onClick={() => { getListData() }}>刷新订单状态</Button>
+          {/* <Button type="dashed" onClick={openModal}>特殊创建</Button> */}
         </Flex>
         <Modal title="新建订单"
           open={isModalOpen}
