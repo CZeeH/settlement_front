@@ -28,7 +28,10 @@ const App = () => {
   const [form] = Form.useForm();
   const [pageForm] = Form.useForm();
   useEffect(() => {
-    getListData()
+    const intervalId = setInterval(() => {
+      getListData()
+    }, 20000); // 60000 毫秒 = 1 分钟
+    return () => clearInterval(intervalId);
   }, [])
   const handleCopyClick = (text) => {
     clipboardCopy(text)
@@ -37,14 +40,14 @@ const App = () => {
   }
   const handleCopyDeatil = (data) => {
     const formattedText = `
-    【接单后先对接老板】老板在qq群，qq群：885967844
+    【接单后先对接老板】老板在qq群，qq群：885967844\n
 
-    [区服]:${data.origin}
-    [游戏项目]:${data.project}
-    [游戏id/名字]:${data.game_id}
-    [游戏段位]:${data.game_level}
-    [订单号]:${data.order_id}
-    [老板qq]:${data.qq_number}
+    [区服]:${data.origin}\n
+    [游戏项目]:${data.project}\n
+    [游戏id/名字]:${data.game_id}\n
+    [游戏段位]:${data.game_level}\n
+    [订单号]:${data.order_id}\n
+    [老板qq]:${data.qq_number}\n
 
     接单注意事项：非mvp主动联系老板上号代练
     `;
@@ -131,10 +134,16 @@ const App = () => {
       key: 'project',
       render: (value, record) => {
         const formattedText = `
-        [区服]:${record.origin}
-        [游戏项目]:${record.project}
-        [游戏id/名字]:${record.game_id}
-        [游戏段位/分数]:${record.game_level || '未告知'}
+        【接单后先对接老板】老板在qq群，qq群：885967844\n
+
+    [区服]:${record.origin}\n
+    [游戏项目]:${record.project}\n
+    [游戏id/名字]:${record.game_id}\n
+    [游戏段位]:${record.game_level}\n
+    [订单号]:${record.order_id}\n
+    [老板qq]:${record.qq_number}\n
+
+    接单注意事项：非mvp主动联系老板上号代练
         `;
         // [订单号]:${record.order_id}
         return (
@@ -293,10 +302,10 @@ const App = () => {
     setPageCurrent(page)
     getListData(form.getFieldsValue(true), (page - 1) * pageSize, pageSize)
   };
-  
+
   const search = () => {
     const param = pageForm.getFieldsValue(true)
-    console.log('param',param)
+    console.log('param', param)
     message.success('暂未开放')
   }
 
@@ -341,7 +350,7 @@ const App = () => {
               </Form.Item>
             </Col>
             <Col span={5}>
-              <Button type="primary"  onClick={() => { search() }}>搜索</Button>
+              <Button type="primary" onClick={() => { search() }}>搜索</Button>
             </Col>
           </Row>
         </Form>

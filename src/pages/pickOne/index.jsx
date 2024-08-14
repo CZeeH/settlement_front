@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Badge, Button, Radio, Flex, Descriptions, message, Result, Spin, Alert,Image } from 'antd';
+import { Form, Input, Badge, Button, Radio, Carousel, Flex, Descriptions, message, Result, Spin, Alert, Image, Modal } from 'antd';
 import clipboardCopy from 'clipboard-copy';
 import { pathServer } from '../../common'
 import { useLocation } from 'react-router-dom';
@@ -58,11 +58,11 @@ const connectMan = [
       <div className='des_image'>
         <h3 >扫码进群对接陪陪/代练</h3>
         <Image
-                  width={330}
-                  height='auto'
-                  alt='指导'
-                  src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024813-payment-1RjuOYZoQbe4.jpg'
-                />
+          width={330}
+          height='auto'
+          alt='指导'
+          src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024813-payment-1RjuOYZoQbe4.jpg'
+        />
       </div>
     )
   },
@@ -178,11 +178,12 @@ const FormPage = () => {
 
   const handleCopyClick = () => {
     const formattedText = `
-    [区服]:${data.origin}
-    [游戏项目]:${data.project}
-    [游戏id/名字]:${data.game_id}
-    [游戏段位]:${data.game_level}
-    [订单号]:${data.order_id}
+    [区服]:${data.origin}\n
+    [游戏项目]:${data.project}\n
+    [游戏id/名字]:${data.game_id}\n
+    [游戏段位]:${data.game_level}\n
+    [订单号]:${data.order_id}\n
+    [备注]:${data.remark}\n
     `;
 
     clipboardCopy(formattedText)
@@ -223,20 +224,29 @@ const FormPage = () => {
     setDescriptionsDetailForMe(items)
   }
 
+  const contentStyle = {
+    height: '160px',
+    color: '#fff',
+    lineHeight: '160px',
+    textAlign: 'center',
+    background: '#364d79',
+  };
+
   return (
     <>
       <Spin spinning={loading}>
         {
           pageStatus === order_status.unSubmitted &&
           <>
-            <div style={{ padding: '20px', backgroundColor: '#f0f2f5' }}>
-              <h1 style={{ color: '#1890ff', marginBottom: '20px' }}>订单信息</h1>
+            <div style={{ padding: '20px' }}>
+
               <Form
                 name="basic"
                 initialValues={{ remember: true }}
                 onFinish={onFinish}
-                style={{ backgroundColor: '#ffffff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}
+                style={{ backgroundColor: '#ffffff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.4)' }}
               >
+                <h1 style={{ color: '#1890ff', marginBottom: '20px' }}>Icon游戏俱乐部订单信息</h1>
                 <Form.Item
                   label="游戏ID/游戏里的名字"
                   name="game_id"
@@ -260,7 +270,7 @@ const FormPage = () => {
                   </Radio.Group>
                 </Form.Item>
 
-                <Form.Item
+                {/* <Form.Item
                   label="对接方式"
                   name="contract_type"
                   rules={[{ required: true, message: '请选择陪玩项目!' }]}
@@ -269,7 +279,7 @@ const FormPage = () => {
                     <Radio value='QQ'>QQ</Radio>
                     <Radio value='微信'>微信</Radio>
                   </Radio.Group>
-                </Form.Item>
+                </Form.Item> */}
                 <Form.Item
                   label="目前的游戏段位/游戏分数"
                   name="game_level"
@@ -289,7 +299,7 @@ const FormPage = () => {
                 <Form.Item
                   label="qq号码"
                   name="qq_number"
-                  tooltip='陪陪会通过qq跟您确认服务内容以及代练细节'
+                  tooltip='陪陪会通过qq跟您确认服务内容'
                   rules={[{ required: true, message: '请输入qq号!' }]}
                 >
                   <Input placeholder="qq号" />
@@ -300,11 +310,29 @@ const FormPage = () => {
                   </Button>
                 </Form.Item>
               </Form>
+              <Carousel autoplay infinite={false} arrows>
+                <div>
+                  <Image src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024814-payment-wXFbiFyNI5Q7.jpg'  width={200}
+          height='auto'  />                
+                  </div>
+                  <div>
+                  <Image src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024814-payment-N8olMo2v2J22.jpg'  width={200}
+          height='auto'  />                
+                  </div>
+                <div>
+                  <Image src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024814-payment-M49ExS9vbHBv.jpg'  width={200}
+          height='auto'  />                
+                  </div>
+                  <div>
+                  <Image src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024814-payment-HUUDe5iTFpCs.jpg'  width={200}
+          height='auto'  />                
+                  </div>
+              </Carousel>
             </div>
           </>
         }
         {
-          [order_status.submitted,order_status.Assigned].includes(pageStatus) &&
+          [order_status.submitted, order_status.Assigned].includes(pageStatus) &&
           (
             <>
               <Flex gap="middle" align="center" vertical>
@@ -320,6 +348,7 @@ const FormPage = () => {
                   items={descriptionsDetailForMe}
                 />
                 <Alert message="操作步骤： 第一：点击右上角 ”一键复制对接信息“按钮 ，第二步扫qq群码进去粘贴内容对接完成！" type="success" />
+                <Alert message="王者技术陪规则：陪玩固定局数，输且非mvp送一局上星代练" type="info" />
 
                 <Descriptions
                   title="对接陪玩信息"
@@ -329,6 +358,7 @@ const FormPage = () => {
                   // borderRadius
                   items={connectMan}
                 />
+
               </Flex>
             </>
           )
