@@ -286,7 +286,14 @@ const FormPage = () => {
                 >
                   <Input placeholder="我不需要指定" />
                 </Form.Item>
-
+                <Form.Item
+                  label="qq号码"
+                  name="qq_number"
+                  tooltip='陪陪会通过qq跟您确认服务内容以及代练细节'
+                  rules={[{ required: true, message: '请输入qq号!' }]}
+                >
+                  <Input placeholder="qq号" />
+                </Form.Item>
                 <Form.Item>
                   <Button type="primary" htmlType="submit">
                     点击开始匹配陪玩

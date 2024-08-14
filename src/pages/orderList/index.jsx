@@ -37,13 +37,14 @@ const App = () => {
   }
   const handleCopyDeatil = (data) => {
     const formattedText = `
-    【接单后先对接老板】老板在qq群，先进qq群 885967844 找老板
+    【接单后先对接老板】老板在qq群，qq群：885967844
 
     [区服]:${data.origin}
     [游戏项目]:${data.project}
     [游戏id/名字]:${data.game_id}
     [游戏段位]:${data.game_level}
     [订单号]:${data.order_id}
+    [老板qq]:${data.qq_number}
 
     接单注意事项：非mvp主动联系老板上号代练
     `;
