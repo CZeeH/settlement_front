@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Space, Table, Tag, Button, Flex, Select, Col, Row, Modal, Form, Cascader,
-   Input, Spin, Popover, message, Descriptions, Pagination } from 'antd';
+import {
+  Space, Table, Tag, Button, Flex, Select, Col, Row, Modal, Form, Cascader,
+  Input, Spin, Popover, message, Descriptions, Pagination
+} from 'antd';
 import { projectData, order_status } from './static'
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { pathServer } from '../../common'
@@ -32,7 +34,7 @@ const App = () => {
     getListData()
     const intervalId = setInterval(() => {
       getListData()
-    }, 20000); // 60000 毫秒 = 1 分钟
+    }, 60000); // 60000 毫秒 = 1 分钟
     return () => clearInterval(intervalId);
   }, [])
   const handleCopyClick = (text) => {
@@ -96,11 +98,17 @@ const App = () => {
       title: '订单号（点击可复制）',
       dataIndex: 'order_id',
       key: 'order_id',
-      render: (v) => {
+      render: (v,record) => {
         return (
-          <CopyToClipboard text={v} onCopy={info}>
-            <Button type="text" color=''>{v}</Button>
-          </CopyToClipboard>
+          <>
+            <CopyToClipboard text={v} onCopy={info}>
+              <Button type="text" color=''>{v}</Button>
+            </CopyToClipboard>
+            {record.game_id !== undefined &&  <CopyToClipboard text={record.game_id} onCopy={info}>
+              <Button type="text" color=''>游戏id:{record.game_id}</Button>
+            </CopyToClipboard>}
+          </>
+
         )
       }
     },
@@ -108,31 +116,31 @@ const App = () => {
       title: '订单状态',
       dataIndex: 'order_status',
       key: 'order_status',
-      render: (v,record) => {
+      render: (v, record) => {
         switch (v) {
           case order_status.unAssigned:
             return (
               <Flex >
-                    <Tag icon={<SyncOutlined spin />} color="processing">等待分配陪玩</Tag>
-                   <div style={{padding:10}}>
-                    <Tag color="processing" >{record.project}</Tag>
-                   </div>
-                </Flex>
+                <Tag icon={<SyncOutlined spin />} color="processing">等待分配陪玩</Tag>
+                <div style={{ padding: 10 }}>
+                  <Tag color="processing" >{record.project}</Tag>
+                </div>
+              </Flex>
             )
           case order_status.Assigned:
             return (
               <>
-               <Tag icon={<CheckCircleOutlined />} color="success">订单分配完毕</Tag>
-               <Tag color="success">{record.project}</Tag>
+                <Tag icon={<CheckCircleOutlined />} color="success">订单分配完毕</Tag>
+                <Tag color="success">{record.project}</Tag>
               </>
-          )
+            )
           default:
             return (
               <>
-              <Tag icon={<ClockCircleOutlined spin />} color="default">等待用户填单</Tag>
-              <Tag color="default">{record.project}</Tag>
+                <Tag icon={<ClockCircleOutlined spin />} color="default">等待用户填单</Tag>
+                <Tag color="default">{record.project}</Tag>
               </>
-            
+
             )
         }
       }
