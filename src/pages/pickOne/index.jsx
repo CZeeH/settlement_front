@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Badge, Button, Radio, Carousel, Flex, Descriptions, message, Result, Spin, Alert, Image, Modal } from 'antd';
+import { Form, Input, Badge, Button, Radio, Carousel, Layout, Flex, Descriptions, message, Result, Spin, Alert, Image, Modal } from 'antd';
 import clipboardCopy from 'clipboard-copy';
 import { pathServer } from '../../common'
 import { useLocation } from 'react-router-dom';
 import queryString from 'query-string';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { layoutStyle, footerStyle, siderStyle, contentStyle, headerStyle, orderStatus } from './static'
 
-const order_status = {
-  unSubmitted: '1', // 未提交信息，表单页面
-  submitted: '2', // 提交信息了 匹配页面 就是 unAssigned
-  wrongCode: '0', // key没有输入或者输入错误，显示提示页面
-  Assigned: '3'
-}
+const { Header, Footer, Sider, Content } = Layout;
+
 
 const info = () => {
   message.success('复制成功')
@@ -20,12 +17,12 @@ const info = () => {
 const connectMan = [
   {
     key: '5',
-    label: '对接扣扣群',
+    label: '对接扣扣群 图片可点 ',
     children: (
-      <div className='des_image'>
+      <div>
         <h3 >老板，扫码进群对接陪陪/代练</h3>
         <Image
-          width={330}
+          width='15em'
           height='auto'
           alt='扫码进群'
           src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024813-payment-Iaw8Tr20QjXN.jpg'
@@ -76,7 +73,7 @@ const FormPage = () => {
     const { key } = queryString.parse(location.search); // 解析查询参数
     const { data = [], total = 0 } = await getData({ random_string: key })
     if (key === undefined || Number(total) === 0) {
-      setPageStatus(order_status.wrongCode)
+      setPageStatus(orderStatus.wrongCode)
       return
     }
     setData(data[0])
@@ -85,7 +82,7 @@ const FormPage = () => {
       formatDescription(data[0])
       return
     }
-    setPageStatus(order_status.unSubmitted)
+    setPageStatus(orderStatus.unSubmitted)
   }
   const [data, setData] = useState({});// 页面数据
   const [descriptionsDetailForMe, setDescriptionsDetailForMe] = useState({});// 订单信息
@@ -135,7 +132,7 @@ const FormPage = () => {
   };
 
   const [loading, setLoading] = useState([]);// 页面数据
-  const [pageStatus, setPageStatus] = useState(order_status.unSubmitted);// 页面数据
+  const [pageStatus, setPageStatus] = useState(orderStatus.unSubmitted);// 页面数据
 
   const updateFetch = async (filter, updateDoc, cbFun = () => { }) => {
     console.log('filter', filter, 'updateDoc', updateDoc)
@@ -168,7 +165,7 @@ const FormPage = () => {
   }
 
   const onFinish = (values) => {
-    updateFetch({ order_id: data.order_id }, { assign_time: (new Date()).toLocaleString(), ...values, order_status: order_status.submitted }, () => {
+    updateFetch({ order_id: data.order_id }, { assign_time: (new Date()).toLocaleString(), ...values, order_status: orderStatus.submitted }, () => {
       checkCode()
     })
 
@@ -192,7 +189,7 @@ const FormPage = () => {
   };
   /** 形成第一个description的数据格式 */
   const formatDescription = (values) => {
-    const { game_id, order_id, origin, project } = values || {}
+    const { game_id, order_id, origin, project, order_status } = values || {}
     const items = [
       {
         key: '3',
@@ -212,7 +209,9 @@ const FormPage = () => {
       {
         key: '5',
         label: '订单状态',
-        children: <Badge status="processing" text="匹配完成" />,
+        children: <>
+          {order_status === orderStatus.Assigned ? <Badge status="success" text="匹配完成" /> : <Badge status="processing" text="匹配陪玩中" />}
+        </>,
       },
       {
         key: '2',
@@ -225,44 +224,49 @@ const FormPage = () => {
   }
 
   return (
-    <>
-      <Spin spinning={loading}>
-        {
-          pageStatus === order_status.unSubmitted &&
-          <>
-            <div style={{ padding: '20px' }}>
+    <Flex gap="middle" wrap>
+      <Layout style={layoutStyle}>
+        <Spin spinning={loading}>
 
-              <Form
-                name="basic"
-                initialValues={{ remember: true }}
-                onFinish={onFinish}
-                style={{ backgroundColor: '#ffffff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.4)' }}
-              >
-                <h1 style={{ color: '#1890ff', marginBottom: '20px' }}>Icon游戏俱乐部订单信息</h1>
-                <Form.Item
-                  label="游戏ID/游戏里的名字"
-                  name="game_id"
-                  tooltip='名字/id错误会导致陪陪联系不到您哦'
-                  rules={[{ required: true, message: '请输入ID!' }]}
 
+          {
+            pageStatus === orderStatus.unSubmitted &&
+            <>
+              <div style={{ padding: '20px' }}>
+                <Header style={{ backgroundColor: '#ffffff', padding: '5px', fontSize:'1rem',fontWeight:'bold', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.4)' }}>
+                  <div >Icon游戏俱乐部订单信息</div>
+                </Header>
+                <Form
+                  name="basic"
+                  initialValues={{ remember: true }}
+                  onFinish={onFinish}
+                  style={{ backgroundColor: '#ffffff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.4)' }}
                 >
-                  <Input placeholder="游戏名字/游戏id " />
-                </Form.Item>
 
-                <Form.Item
-                  label="区服选择"
-                  name="origin"
-                  rules={[{ required: true, message: '请选择区服!' }]}
-                >
-                  <Radio.Group>
-                    <Radio value='安卓QQ区'>安卓QQ区</Radio>
-                    <Radio value='苹果QQ区'>苹果QQ区</Radio>
-                    <Radio value='安卓微信区'>安卓微信区</Radio>
-                    <Radio value='苹果微信区'>苹果微信区</Radio>
-                  </Radio.Group>
-                </Form.Item>
+                  <Form.Item
+                    label="游戏ID/游戏里的名字"
+                    name="game_id"
+                    tooltip='名字/id错误会导致陪陪联系不到您哦'
+                    rules={[{ required: true, message: '请输入ID!' }]}
 
-                {/* <Form.Item
+                  >
+                    <Input placeholder="游戏名字/游戏id " />
+                  </Form.Item>
+
+                  <Form.Item
+                    label="区服选择"
+                    name="origin"
+                    rules={[{ required: true, message: '请选择区服!' }]}
+                  >
+                    <Radio.Group>
+                      <Radio value='安卓QQ区'>安卓QQ区</Radio>
+                      <Radio value='苹果QQ区'>苹果QQ区</Radio>
+                      <Radio value='安卓微信区'>安卓微信区</Radio>
+                      <Radio value='苹果微信区'>苹果微信区</Radio>
+                    </Radio.Group>
+                  </Form.Item>
+
+                  {/* <Form.Item
                   label="对接方式"
                   name="contract_type"
                   rules={[{ required: true, message: '请选择陪玩项目!' }]}
@@ -272,107 +276,115 @@ const FormPage = () => {
                     <Radio value='微信'>微信</Radio>
                   </Radio.Group>
                 </Form.Item> */}
-                <Form.Item
-                  label="目前的游戏段位/游戏分数"
-                  name="game_level"
-                  rules={[{ required: true, message: '请选择陪玩项目!' }]}
-                >
-                  <Input placeholder="例如：王者荣耀： 钻石三 或者 蛋仔2100分  光遇填无" />
-                </Form.Item>
-                <Form.Item
-                  label="备注"
-                  name="remark"
-                  tooltip="如需指定男女等 无特别要求可以不填"
+                  <Form.Item
+                    label="目前的游戏段位/游戏分数"
+                    name="game_level"
+                    rules={[{ required: true, message: '请选择陪玩项目!' }]}
+                  >
+                    <Input placeholder="例如：王者荣耀： 钻石三 或者 蛋仔2100分  光遇填无" />
+                  </Form.Item>
+                  <Form.Item
+                    label="备注"
+                    name="remark"
+                    tooltip="如需指定男女等 无特别要求可以不填"
 
-                  rules={[{ required: false, message: '请选择陪玩项目!' }]}
-                >
-                  <Input placeholder="我不需要指定" />
-                </Form.Item>
-                <Form.Item
-                  label="qq号码"
-                  name="qq_number"
-                  tooltip='陪陪会通过qq跟您确认服务内容'
-                  rules={[{ required: true, message: '请输入qq号!' }]}
-                >
-                  <Input placeholder="qq号" />
-                </Form.Item>
-                <Form.Item>
-                  <Button type="primary" htmlType="submit">
-                    点击开始匹配陪玩
-                  </Button>
-                </Form.Item>
-              </Form>
-              <div>
-                <Carousel autoplay infinite={false} arrows>
-                  <div>
-                    <Image src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024814-payment-wXFbiFyNI5Q7.jpg' width={200}
-                      height='auto' />
-                  </div>
-                  <div>
-                    <Image src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024814-payment-N8olMo2v2J22.jpg' width={200}
-                      height='auto' />
-                  </div>
-                  <div>
-                    <Image src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024814-payment-M49ExS9vbHBv.jpg' width={200}
-                      height='auto' />
-                  </div>
-                  <div>
-                    <Image src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024814-payment-HUUDe5iTFpCs.jpg' width={200}
-                      height='auto' />
-                  </div>
-                </Carousel>
+                    rules={[{ required: false, message: '请选择陪玩项目!' }]}
+                  >
+                    <Input placeholder="我不需要指定" />
+                  </Form.Item>
+                  <Form.Item
+                    label="qq号码"
+                    name="qq_number"
+                    tooltip='陪陪会通过qq跟您确认服务内容'
+                    rules={[{ required: true, message: '请输入qq号!' }]}
+                  >
+                    <Input placeholder="qq号" />
+                  </Form.Item>
+                  <Form.Item>
+                    <Button type="primary" htmlType="submit">
+                      点击开始匹配陪玩
+                    </Button>
+                  </Form.Item>
+                </Form>
+                <div>
+                  <Carousel autoplay infinite={false} arrows>
+                    <div>
+                      <Image src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024814-payment-wXFbiFyNI5Q7.jpg' width={200}
+                        height='auto' />
+                    </div>
+                    <div>
+                      <Image src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024814-payment-N8olMo2v2J22.jpg' width={200}
+                        height='auto' />
+                    </div>
+                    <div>
+                      <Image src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024814-payment-M49ExS9vbHBv.jpg' width={200}
+                        height='auto' />
+                    </div>
+                    <div>
+                      <Image src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024814-payment-HUUDe5iTFpCs.jpg' width={200}
+                        height='auto' />
+                    </div>
+                  </Carousel>
+                </div>
+
               </div>
-
-            </div>
-          </>
-        }
-        {
-          [order_status.submitted, order_status.Assigned].includes(pageStatus) &&
-          (
-            <>
-              <Flex gap="middle" align="center" vertical>
-                {/* <div style={{ padding: '20px', backgroundColor: '#f0f2f5' }}>
+            </>
+          }
+          {
+            [orderStatus.submitted, orderStatus.Assigned].includes(pageStatus) &&
+            (
+              <>
+                <Flex gap="middle" align="star" vertical >
+                  {/* <div style={{ padding: '20px', backgroundColor: '#f0f2f5' }}>
                 订单匹配中，亲亲稍等5分钟左右，在这里可以看到陪陪信息
                 </div> */}
-                <Descriptions
-                  title="您的订单信息"
-                  size='small'
-                  extra={<Button type="primary" onClick={handleCopyClick}>一键复制对接信息</Button>}
-                  bordered
-                  // borderRadius
-                  items={descriptionsDetailForMe}
-                />
-                <Alert message="操作步骤： 第一：点击右上角 ”一键复制对接信息“按钮 ，第二步扫qq群码进去粘贴内容对接完成！" type="success" />
-                <Alert message="王者技术陪规则：陪玩固定局数，输且非mvp送一局上星代练" type="info" />
+                  <Content style={contentStyle}>
+                    <Descriptions
+                      title="您的订单信息"
+                      size='small'
+                      extra={<Button type="primary" onClick={handleCopyClick}>一键复制对接信息</Button>}
+                      bordered
+                      // borderRadius
+                      items={descriptionsDetailForMe}
+                    />
+                    <Alert message="操作步骤： 第一：点击右上角 ”一键复制对接信息“按钮 ，第二步扫qq群码进去粘贴内容对接完成！" type="success" />
+                    <Alert message="王者技术陪规则：陪玩固定局数，输且非mvp送一局上星代练" type="info" />
 
-                <Descriptions
-                  title="对接陪玩信息"
-                  size='small'
-                  // extra={<Button type="primary">Edit</Button>}
-                  bordered
-                  // borderRadius
-                  items={connectMan}
-                />
+                    <Descriptions
+                      title="对接陪玩信息(下方)"
+                      size='small'
+                      // extra={<Button type="primary">Edit</Button>}
+                      bordered
+                      // borderRadius
+                      items={connectMan}
+                    />
 
-              </Flex>
-            </>
-          )
-        }
-        {
-          pageStatus === order_status.wrongCode && (
-            <Result
-              status="warning"
-              title="您的链接错误 请检查是否复制完全。要复制完全才可以哦（如果还是不行咨询一下客服姐姐哦）"
-            // extra={
-            //   <Button type="primary" key="console">
-            //     重新输入
-            //   </Button>
-            // }
-            />
-          )
-        }
-      </Spin>
-    </>
+                  </Content>
+                </Flex>
+
+              </>
+            )
+          }
+          {
+            pageStatus === orderStatus.wrongCode && (
+              <Result
+                status="warning"
+                title="您的链接错误 请检查是否复制完全。要复制完全才可以哦（如果还是不行咨询一下客服姐姐哦）"
+              // extra={
+              //   <Button type="primary" key="console">
+              //     重新输入
+              //   </Button>
+              // }
+              />
+            )
+          }
+          {/* <Footer style={footerStyle}>Footer</Footer> */}
+
+
+
+        </Spin>
+      </Layout>
+    </Flex>
 
   )
 };

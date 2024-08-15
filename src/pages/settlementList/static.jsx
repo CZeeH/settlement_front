@@ -39,6 +39,14 @@ const midStyle = {
     margin: '0 auto'
 }
 
+/** 订单状态 */
+const order_status = {
+    unSubmitted: '1',
+    unAssigned: '2',
+    Assigned: '3'
+}
+
+
 export {
-    headerStyle,contentStyle,footerStyle,layoutStyle,headerRowStyle,midStyle
+    headerStyle,contentStyle,footerStyle,layoutStyle,headerRowStyle,midStyle,order_status
 }
