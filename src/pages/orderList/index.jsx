@@ -13,7 +13,7 @@ import {
 } from '@ant-design/icons';
 import clipboardCopy from 'clipboard-copy';
 
-const regex = /^\d{6}-\d{15}$/;
+const regex = /^\d{6}-\d{15}$/
 const info = () => {
   message.success('复制成功')
 }
@@ -98,13 +98,13 @@ const App = () => {
       title: '订单号（点击可复制）',
       dataIndex: 'order_id',
       key: 'order_id',
-      render: (v,record) => {
+      render: (v, record) => {
         return (
           <>
             <CopyToClipboard text={v} onCopy={info}>
               <Button type="text" color=''>{v}</Button>
             </CopyToClipboard>
-            {record.game_id !== undefined &&  <CopyToClipboard text={record.game_id} onCopy={info}>
+            {record.game_id !== undefined && <CopyToClipboard text={record.game_id} onCopy={info}>
               <Button type="text" color=''>游戏id:{record.game_id}</Button>
             </CopyToClipboard>}
           </>
@@ -331,8 +331,29 @@ const App = () => {
 
   const search = () => {
     const param = pageForm.getFieldsValue(true)
-    console.log('param', param)
-    message.success('暂未开放')
+    console.log('param', param, pageTotals)
+    getListData(param, (pageCurrent - 1) * 10)
+    // message.success('暂未开放')
+  }
+
+  const reset = () => {
+    pageForm.resetFields()
+    getListData()
+  }
+
+  const generateRandomString = (length) => {
+    const charset = '0123456789';
+    let randomString = '';
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * charset.length);
+      randomString += charset[randomIndex];
+    }
+    return randomString;
+  }
+
+  const generateRandomOrderId = () => {
+    const text = `333333-${generateRandomString(15)}`
+    form.setFieldValue('order_id', text)
   }
 
   return (
@@ -376,21 +397,25 @@ const App = () => {
               </Form.Item>
             </Col>
             <Col span={5}>
-              <Button type="primary" onClick={() => { search() }}>搜索</Button>
+              <Space>
+                <Button type="primary" onClick={() => { search() }}>搜索</Button>
+                <Button onClick={() => { reset() }}>重置</Button>
+              </Space>
             </Col>
           </Row>
         </Form>
-
-
         <Flex gap="small" wrap>
           <Button type="primary" onClick={openModal}>新单创建</Button>
           <Button onClick={() => { getListData() }}>刷新订单状态</Button>
-          {/* <Button type="dashed" onClick={openModal}>特殊创建</Button> */}
         </Flex>
         <Modal title="新建订单"
           open={isModalOpen}
-          onOk={handleOk}
-          onCancel={handleCancel}
+          onOk={() => {
+            handleOk()
+          }}
+          onCancel={() => {
+            handleCancel()
+          }}
           okText='创建'
           cancelText='取消'
           clearOnDestroy
@@ -404,34 +429,44 @@ const App = () => {
             wrapperCol={{
               span: 16,
             }}
-            style={{
-              maxWidth: 600,
-            }}
-            form={form}
-            // initialValues={{
-            //   remember: true,
+            // style={{
+            //   maxWidth: 600,
             // }}
+            form={form}
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
             autoComplete="off"
           >
-            <Form.Item
-              label="订单号"
-              name="order_id"
-              rules={[
-                {
-                  required: true,
-                  message: '请输入正确的订单号',
-                  pattern: regex
-                }
-              ]}
+            <Form.Item 
+            label="订单号"
             >
-              <Input />
+                <Form.Item
+                  // label="订单号"
+                  name="order_id"
+                  rules={[
+                    {
+                      required: true,
+                      message: '请输入正确的订单号',
+                      pattern: regex
+                    }
+                  ]}
+                  wrapperCol={{
+                    span: 21,
+                  }}
+                  style={{margin:'0 auto'}}
+                >
+                  <Input />
+                </Form.Item>
+                <Button  onClick={() =>{ generateRandomOrderId()}}>随机创建</Button>
             </Form.Item>
+
 
             <Form.Item
               label="项目"
               name="project"
+              wrapperCol={{
+                span: 14,
+              }}
               rules={[
                 {
                   required: true,
@@ -443,17 +478,17 @@ const App = () => {
                 options={projectData}
               />
             </Form.Item>
-            <Form.Item
+            {/* <Form.Item
               wrapperCol={{
                 offset: 8,
                 span: 16,
               }}
             >
-            </Form.Item>
+            </Form.Item> */}
           </Form>
         </Modal>
         <Modal
-          title="新建订单"
+          title="订单信息"
           open={isDetailModalOpen}
           onOk={() => {
             setIsDetailModalOpen(false)
