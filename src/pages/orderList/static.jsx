@@ -190,4 +190,40 @@ const projectData = [
     },
 ]
 
-export { projectData, order_status }
+const headerStyle = {
+    // textAlign: 'center',
+    // color: '#fff',
+    width: '100%',
+    minHeight: '200px',
+    padding: 48,
+    margin:'10px',
+    // lineHeight: '64px',
+    backgroundColor: '#fff',
+};
+const contentStyle = {
+    // textAlign: 'center',
+    minHeight: '120px',
+    // lineHeight: '120px',
+    padding: '10px',
+    // color: '#fff',
+    backgroundColor: '#fff',
+};
+const siderStyle = {
+    textAlign: 'center',
+    lineHeight: '120px',
+    color: '#fff',
+    backgroundColor: '#fff',
+};
+const footerStyle = {
+    textAlign: 'center',
+    color: '#fff',
+    backgroundColor: '#4096ff',
+};
+const layoutStyle = {
+    borderRadius: 8,
+    overflow: 'hidden',
+    width: 'calc(100% - 8px)',
+    maxWidth: 'calc(100% - 8px)',
+    minWidth:'400px'
+};
+export { projectData, order_status, layoutStyle, footerStyle, siderStyle, contentStyle, headerStyle }

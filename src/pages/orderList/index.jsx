@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
   Space, Table, Tag, Button, Flex, Select, Col, Row, Modal, Form, Cascader,
-  Input, Spin, Popover, message, Descriptions, Pagination
+  Input, Spin, Layout, message, Descriptions, Pagination
 } from 'antd';
-import { projectData, order_status } from './static'
+import { projectData, order_status, layoutStyle, footerStyle, siderStyle, contentStyle, headerStyle, } from './static'
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { pathServer } from '../../common'
 import {
@@ -13,6 +13,7 @@ import {
 } from '@ant-design/icons';
 import clipboardCopy from 'clipboard-copy';
 
+const { Header, Footer, Sider, Content } = Layout;
 const regex = /^\d{6}-\d{15}$/
 const info = () => {
   message.success('复制成功')
@@ -45,13 +46,15 @@ const App = () => {
   const handleCopyDeatil = (data) => {
     const formattedText = `
     【接单后先对接老板】老板在qq群，qq群：885967844\n
-
+    
     [区服]:${data.origin}\n
     [游戏项目]:${data.project}\n
     [游戏id/名字]:${data.game_id}\n
     [游戏段位]:${data.game_level}\n
     [订单号]:${data.order_id}\n
+    [老板备注]:${data.remark}\n
     [老板qq]:${data.qq_number}\n
+    
 
     接单注意事项：非mvp主动联系老板上号代练
     `;
@@ -93,6 +96,24 @@ const App = () => {
   const handleFinishAssign = (id) => {
     updateFetch({ order_id: id }, { order_status: order_status.Assigned }, () => { getListData() })
   }
+
+  const getTextColor = (value) => {
+    let color = {}
+    switch (value) {
+      case (order_status.Assigned):
+        color = { color: '#82c954' };
+        break;
+      case (order_status.unAssigned):
+        color = { color: '#3875f6' };
+        break;
+      case (order_status.unSubmitted):
+        color = { color: 'red' };
+        break;
+      default:
+        color = { color: 'black' };
+    }
+    return color
+  }
   const columns = [
     {
       title: '订单号（点击可复制）',
@@ -102,10 +123,10 @@ const App = () => {
         return (
           <>
             <CopyToClipboard text={v} onCopy={info}>
-              <Button type="text" color=''>{v}</Button>
+              <Button type="text" style={getTextColor(record.order_status)}>{v}</Button>
             </CopyToClipboard>
             {record.game_id !== undefined && <CopyToClipboard text={record.game_id} onCopy={info}>
-              <Button type="text" color=''>游戏id:{record.game_id}</Button>
+              <Button type="text" style={getTextColor(record.order_status)}>游戏id:{record.game_id}</Button>
             </CopyToClipboard>}
           </>
 
@@ -145,48 +166,6 @@ const App = () => {
         }
       }
     },
-    // {
-    //   title: '下单时间',
-    //   dataIndex: 'add_time',
-    //   key: 'add_time',
-    //   render: (v) => {
-    //     let date = new Date(v);
-    //     return date.toLocaleString()
-    //   }
-    // },
-    // {
-    //   title: '订单详情(点击可复制)',
-    //   dataIndex: 'project',
-    //   key: 'project',
-    //   render: (value, record) => {
-    //     const formattedText = `
-    //     【接单后先对接老板】老板在qq群，qq群：885967844\n
-
-    // [区服]:${record.origin}\n
-    // [游戏项目]:${record.project}\n
-    // [游戏id/名字]:${record.game_id}\n
-    // [游戏段位]:${record.game_level}\n
-    // [订单号]:${record.order_id}\n
-    // [老板qq]:${record.qq_number}\n
-
-    // 接单注意事项：非mvp主动联系老板上号代练
-    //     `;
-    //     // [订单号]:${record.order_id}
-    //     return (
-    //       <>
-    //         {
-    //           [order_status.unAssigned, order_status.Assigned].includes(record.order_status) ?
-    //             (<Popover content={formattedText} title="订单详情（点击复制）" >
-    //               <p onClick={() => { handleCopyDeatil(record) }}>{value}</p>
-    //             </Popover>)
-    //             :
-    //             (<p>{value}</p>)
-    //         }
-
-    //       </>
-    //     )
-    //   }
-    // },
     {
       title: '操作',
       key: 'action',
@@ -194,9 +173,11 @@ const App = () => {
       width: 200,
       render: (_, record) => (
         <Space size="middle">
+          {[order_status.unAssigned, order_status.Assigned].includes(record.order_status) && <Button type={
+            record.order_status === order_status.unAssigned ? 'primary' : ''
+          } onClick={() => { handleCopyDeatil(record) }}>复制详情</Button>}
           {record.order_status === order_status.unAssigned && (
             <>
-              <Button type='primary' onClick={() => { handleCopyDeatil(record) }}>复制详情</Button>
               <Button type='primary' onClick={() => { handleFinishAssign(record.order_id) }}>匹配完成</Button>
             </>
           )}
@@ -357,15 +338,15 @@ const App = () => {
   }
 
   return (
-    <>
-      <Spin spinning={loading}>
+    <Layout style={layoutStyle}>
+      <Header style={headerStyle}>
         <Form
           name="searchPage"
           form={pageForm}
           autoComplete="off"
         >
-          <Row gutter={10}>
-            <Col span={7}>
+          <Row gutter={5}>
+            <Col xs={12} sm={12} md={12} lg={8} xl={8}>
               <Form.Item
                 label="订单号"
                 name="order_id"
@@ -380,7 +361,7 @@ const App = () => {
                 <Input />
               </Form.Item>
             </Col>
-            <Col span={4}>
+            <Col xs={12} sm={12} md={12} lg={4} xl={4}>
               <Form.Item
                 label="订单状态"
                 name="order_status"
@@ -396,50 +377,50 @@ const App = () => {
                 />
               </Form.Item>
             </Col>
-            <Col span={5}>
-              <Space>
-                <Button type="primary" onClick={() => { search() }}>搜索</Button>
-                <Button onClick={() => { reset() }}>重置</Button>
-              </Space>
-            </Col>
+            <Col xs={6} sm={8} md={4} lg={2} xl={2}><Button type="primary" onClick={() => { search() }}>搜索</Button></Col>
+            <Col xs={6} sm={8} md={4} lg={2} xl={2}><Button onClick={() => { reset() }}>重置</Button></Col>
+            {/* <Col span={24}></Col> */}
+            <Col xs={6} sm={8} md={4} lg={2} xl={2}><Button type="primary" onClick={openModal}>新建</Button></Col>
+            <Col xs={6} sm={8} md={4} lg={2} xl={2}> <Button onClick={() => { getListData() }}>刷新</Button></Col>
           </Row>
         </Form>
-        <Flex gap="small" wrap>
-          <Button type="primary" onClick={openModal}>新单创建</Button>
-          <Button onClick={() => { getListData() }}>刷新订单状态</Button>
-        </Flex>
-        <Modal title="新建订单"
-          open={isModalOpen}
-          onOk={() => {
-            handleOk()
-          }}
-          onCancel={() => {
-            handleCancel()
-          }}
-          okText='创建'
-          cancelText='取消'
-          clearOnDestroy
-          confirmLoading={loading}
-        >
-          <Form
-            name="basic"
-            labelCol={{
-              span: 8,
+      </Header>
+      <Content style={contentStyle}>
+        <Spin spinning={loading}>
+
+
+          <Modal title="新建订单"
+            open={isModalOpen}
+            onOk={() => {
+              handleOk()
             }}
-            wrapperCol={{
-              span: 16,
+            onCancel={() => {
+              handleCancel()
             }}
-            // style={{
-            //   maxWidth: 600,
-            // }}
-            form={form}
-            onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
-            autoComplete="off"
+            okText='创建'
+            cancelText='取消'
+            clearOnDestroy
+            confirmLoading={loading}
           >
-            <Form.Item 
-            label="订单号"
+            <Form
+              name="basic"
+              labelCol={{
+                span: 8,
+              }}
+              wrapperCol={{
+                span: 16,
+              }}
+              // style={{
+              //   maxWidth: 600,
+              // }}
+              form={form}
+              onFinish={onFinish}
+              onFinishFailed={onFinishFailed}
+              autoComplete="off"
             >
+              <Form.Item
+                label="订单号"
+              >
                 <Form.Item
                   // label="订单号"
                   name="order_id"
@@ -453,70 +434,79 @@ const App = () => {
                   wrapperCol={{
                     span: 21,
                   }}
-                  style={{margin:'0 auto'}}
+                  style={{ margin: '0 auto' }}
                 >
                   <Input />
                 </Form.Item>
-                <Button  onClick={() =>{ generateRandomOrderId()}}>随机创建</Button>
-            </Form.Item>
+                <Button onClick={() => { generateRandomOrderId() }}>随机创建</Button>
+              </Form.Item>
 
 
-            <Form.Item
-              label="项目"
-              name="project"
-              wrapperCol={{
-                span: 14,
-              }}
-              rules={[
-                {
-                  required: true,
-                  message: '请选择游戏项目',
-                },
-              ]}
-            >
-              <Cascader
-                options={projectData}
-              />
-            </Form.Item>
-            {/* <Form.Item
+              <Form.Item
+                label="项目"
+                name="project"
+                wrapperCol={{
+                  span: 14,
+                }}
+                rules={[
+                  {
+                    required: true,
+                    message: '请选择游戏项目',
+                  },
+                ]}
+              >
+                <Cascader
+                  options={projectData}
+                />
+              </Form.Item>
+              {/* <Form.Item
               wrapperCol={{
                 offset: 8,
                 span: 16,
               }}
             >
             </Form.Item> */}
-          </Form>
-        </Modal>
-        <Modal
-          title="订单信息"
-          open={isDetailModalOpen}
-          onOk={() => {
-            setIsDetailModalOpen(false)
-            getListData()
-          }}
-          okText='完成'
-          cancelText='取消'
-          onCancel={() => { setIsDetailModalOpen(false) }}
-          clearOnDestroy
-        >
-          <Descriptions
-            bordered
-            title="订单链接与信息"
-            size='small'
-            extra={<Button type="primary" onClick={() => { handleCopyClick(copyUrl) }}>一键复制链接</Button>}
-            items={modalDetail}
+            </Form>
+          </Modal>
+          <Modal
+            title="订单信息"
+            open={isDetailModalOpen}
+            onOk={() => {
+              setIsDetailModalOpen(false)
+              getListData()
+            }}
+            okText='完成'
+            cancelText='取消'
+            onCancel={() => { setIsDetailModalOpen(false) }}
+            clearOnDestroy
+          >
+            <Descriptions
+              bordered
+              title="订单链接与信息"
+              size='small'
+              extra={<Button type="primary" onClick={() => { handleCopyClick(copyUrl) }}>一键复制链接</Button>}
+              items={modalDetail}
+            />
+          </Modal>
+          <Table
+            columns={columns}
+            dataSource={listData}
+            scroll={{ x: 1300, }}
+            pagination={false}
+            rowKey={record => record.order_id} />
+          <Pagination
+            align="center"
+            defaultCurrent={1}
+            total={pageTotals}
+            current={pageCurrent}
+            onChange={onPageChange}
           />
-        </Modal>
-        <Table columns={columns} dataSource={listData} pagination={false} rowKey={record => record.order_id} />
-        <Pagination
-          align="center"
-          defaultCurrent={1}
-          total={pageTotals}
-          current={pageCurrent}
-          onChange={onPageChange}
-        />
-      </Spin>
-    </>
+        </Spin>
+
+      </Content>
+      {/* <Footer style={footerStyle}>Footer</Footer> */}
+    </Layout>
+
   )
 }
 export default App;
