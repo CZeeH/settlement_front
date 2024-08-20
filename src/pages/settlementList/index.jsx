@@ -32,12 +32,12 @@ const OrderTable = () => {
         message.success('复制成功')
     }
     const showModal = (value) => {
-        setOpen(true);
         seModalValues(value)
+        setOpen(true);
     };
     const handleCancel = () => {
-        form.resetFields()
         setOpen(false);
+        form.resetFields()
     };
     const onPageChange = (page, pageSize) => {
         setPageCurrent(page)

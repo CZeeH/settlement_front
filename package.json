@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.4.0",
     "antd": "^5.19.1",
     "big.js": "^6.2.1",
     "clipboard-copy": "^4.0.1",

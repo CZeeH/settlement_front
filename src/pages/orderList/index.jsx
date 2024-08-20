@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Space, Table, Tag, Button, Flex, Select, Col, Row, Modal, Form, Cascader,
-  Input, Spin, Layout, message, Descriptions, Pagination
+  Input, Spin, Layout, message, Descriptions, Pagination, Popover
 } from 'antd';
 import { projectData, order_status, layoutStyle, footerStyle, siderStyle, contentStyle, headerStyle, } from './static'
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -9,6 +9,7 @@ import { pathServer } from '../../common'
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
+  ExclamationCircleOutlined,
   SyncOutlined,
 } from '@ant-design/icons';
 import clipboardCopy from 'clipboard-copy';
@@ -116,7 +117,13 @@ const App = () => {
   }
   const columns = [
     {
-      title: '订单号（点击可复制）',
+      // title: '订单号（点击可复制）',
+      title: (<>
+        订单号
+        <Popover content='点击均可复制' title="提示">
+          <Tag bordered={false} color="processing" icon={<ExclamationCircleOutlined />}></Tag>
+        </Popover>
+      </>),
       dataIndex: 'order_id',
       key: 'order_id',
       render: (v, record) => {
@@ -152,7 +159,13 @@ const App = () => {
             return (
               <>
                 <Tag icon={<CheckCircleOutlined />} color="success">订单分配完毕</Tag>
-                <Tag color="success">{record.project}</Tag>
+
+                {record.work_wx === undefined ? <Tag color="success">{record.project}</Tag> : (
+                  <CopyToClipboard text={v} onCopy={info}>
+                    <Button type="text" style={getTextColor(record.work_wx)}>{record.work_wx}</Button>
+                  </CopyToClipboard>)
+                }
+
               </>
             )
           default:
@@ -167,7 +180,13 @@ const App = () => {
       }
     },
     {
-      title: '操作',
+      title: (<>
+        操作
+        <Popover content='点击“链接”、“详情”均可复制' title="提示">
+          <Tag bordered={false} color="processing" icon={<ExclamationCircleOutlined />}></Tag>
+        </Popover>
+
+      </>),
       key: 'action',
       fixed: 'right',
       width: 200,
@@ -175,14 +194,14 @@ const App = () => {
         <Space size="middle">
           {[order_status.unAssigned, order_status.Assigned].includes(record.order_status) && <Button type={
             record.order_status === order_status.unAssigned ? 'primary' : ''
-          } onClick={() => { handleCopyDeatil(record) }}>复制详情</Button>}
+          } onClick={() => { handleCopyDeatil(record) }}>详情</Button>}
           {record.order_status === order_status.unAssigned && (
             <>
               <Button type='primary' onClick={() => { handleFinishAssign(record.order_id) }}>匹配完成</Button>
             </>
           )}
           <Button onClick={() => { handleCopyClick(record.random_url) }}>
-            复制链接
+            链接
           </Button>
           <Button onClick={() => { handleDelete(record.order_id) }}>删除</Button>
         </Space>
@@ -491,7 +510,7 @@ const App = () => {
           <Table
             columns={columns}
             dataSource={listData}
-            scroll={{ x: 1300, }}
+            scroll={{ x: 1000, }}
             pagination={false}
             rowKey={record => record.order_id} />
           <Pagination
