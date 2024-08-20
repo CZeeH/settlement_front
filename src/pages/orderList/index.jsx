@@ -161,8 +161,8 @@ const App = () => {
                 <Tag icon={<CheckCircleOutlined />} color="success">订单分配完毕</Tag>
 
                 {record.work_wx === undefined ? <Tag color="success">{record.project}</Tag> : (
-                  <CopyToClipboard text={v} onCopy={info}>
-                    <Button type="text" style={getTextColor(record.work_wx)}>{record.work_wx}</Button>
+                  <CopyToClipboard text={record.work_wx} onCopy={info}>
+                    <Button type="text" style={getTextColor(record.order_status)}>{record.work_wx}</Button>
                   </CopyToClipboard>)
                 }
 
