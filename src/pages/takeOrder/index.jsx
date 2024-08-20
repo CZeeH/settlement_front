@@ -93,8 +93,9 @@ const App = () => {
       render: (v, record) => {
         return (
           <>
-            <Tag color="magenta" >{v}</Tag>
+            <Tag color="magenta" >{v}*{record.game_level}</Tag>
             <Tag color="processing" >{record.origin}</Tag>
+            <Tag color="processing" ></Tag>
             <Tag color="gold" >备注：{record.remark}</Tag>
           </>
         )
