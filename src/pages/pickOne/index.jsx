@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Badge, Button, Radio, Carousel, Layout, Flex, Descriptions, message, Result, Spin, Alert, Image, Modal } from 'antd';
+import { Form, Input, Badge, Button, Radio, Carousel, Layout, Progress, Flex, Descriptions, message, Result, Spin, Alert, Image, Modal } from 'antd';
 import clipboardCopy from 'clipboard-copy';
 import { pathServer } from '../../common'
 import { useLocation } from 'react-router-dom';
@@ -14,75 +14,44 @@ const info = () => {
   message.success('复制成功')
 }
 
-const connectMan = [
-  {
-    key: '5',
-    label: '对接扣扣群 图片可点 ',
-    children: (
-      <div>
-        <h3 >老板，扫码进群对接陪陪/代练</h3>
-        <Image
-          width='15em'
-          height='auto'
-          alt='扫码进群'
-          src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024813-payment-Iaw8Tr20QjXN.jpg'
-        />
-      </div>
-    )
-  },
-  {
-    key: '1',
-    label: '联系微信',
-    children: (
-      <CopyToClipboard text='SKY-777A' onCopy={info}>
-        <Button type="dashed" color=''>SKY-777A</Button>
-      </CopyToClipboard>
-    ),
-  },
-  {
-    key: '2',
-    label: '联系qq群账号',
-    children: (
-      <CopyToClipboard text='885967844' onCopy={info}>
-        <Button type="dashed" color=''>885967844</Button>
-      </CopyToClipboard>
-    ),
-  },
-  {
-    key: '6',
-    label: '案例参考',
-    children: (
-      <div className='des_image'>
-        <h3 >扫码进群对接陪陪/代练</h3>
-        <Image
-          width={330}
-          height='auto'
-          alt='指导'
-          src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024813-payment-1RjuOYZoQbe4.jpg'
-        />
-      </div>
-    )
-  },
-]
-
 const FormPage = () => {
   const location = useLocation();
   /**检查是否有key 对应好订单 确定状态 */
   const checkCode = async () => {
     // 从 URL 中获取 key 参数
     const { key } = queryString.parse(location.search); // 解析查询参数
-    const { data = [], total = 0 } = await getData({ random_string: key })
-    if (key === undefined || Number(total) === 0) {
+    if (key === undefined) {
+      setPageStatus(orderStatus.wrongCode)
+      return
+    }
+    const res = await getData({ random_string: key }, (status) => {
+      setConnect(status)
+    })
+    const { total, data } = res
+    console.log(res)
+    // key 错误
+    if (Number(total) === 0) {
+      console.log(Number(total), total)
       setPageStatus(orderStatus.wrongCode)
       return
     }
     setData(data[0])
-    if (data[0].order_status !== undefined) {
-      setPageStatus(data[0].order_status)
-      formatDescription(data[0])
+    //  unSubmitted
+    if (data[0].order_status === undefined) {
+      setPageStatus(orderStatus.unSubmitted)
       return
     }
-    setPageStatus(orderStatus.unSubmitted)
+
+    //  Assigned && submitted
+    setPageStatus(data[0].order_status)
+    formatDescription(data[0])
+    if (data[0].order_status === orderStatus.Assigned) {
+      return
+    }
+    // 有 submitted
+    const intervalId = setInterval(() => {
+      checkStatus()
+    }, 60000); // 60000 毫秒 = 1 分钟
   }
   const [data, setData] = useState({});// 页面数据
   const [descriptionsDetailForMe, setDescriptionsDetailForMe] = useState({});// 订单信息
@@ -91,39 +60,147 @@ const FormPage = () => {
     checkCode()
   }, [])
 
-  const getData = async (query, skip = 0, limit = 10) => {
-    setLoading(true);
+  const checkStatus = async () => {
+    const newData = await getData({ order_id: data.order_id }, (status) => {
+      setConnect(status)
+    })
+    console.log('ing ', newData)
+    setData(newData[0])
+    if (newData[0].order_status === orderStatus.Assigned) {
+      clearInterval(intervalId)
+    }
+  }
 
+  const setConnect = (status) => {
+    let item = []
+    console.log(pageStatus === orderStatus.Assigned, pageStatus)
+    if (status === orderStatus.Assigned) {
+
+      item = [
+        {
+          key: '1',
+          label: '陪陪联系微信',
+          children: (
+            data.work_wx ? (
+              <CopyToClipboard text={data.work_wx || ''} onCopy={info}>
+                <Button type="primary" color=''>{data.work_wx || ''}</Button>
+              </CopyToClipboard>
+            ) : (
+              <>
+                陪陪即将添加您，请关注联系信息，超过10分钟未联系请告知客服。
+              </>
+            )
+          ),
+        },
+        {
+          key: '2',
+          label: '陪陪联系qq',
+          children: (
+            data.work_qq ? (
+              <CopyToClipboard text={data.work_qq || ''} onCopy={info}>
+                <Button type="primary" color=''>{data.work_qq || ''}</Button>
+              </CopyToClipboard>
+            ) : (
+              <>
+                -
+              </>
+            )
+          ),
+        },
+        {
+          key: '2',
+          label: '售后/找不到陪陪/抽奖qq群账号',
+          children: (
+            <CopyToClipboard text='885967844' onCopy={info}>
+              <Button type="primary" color=''>885967844</Button>
+            </CopyToClipboard>
+          ),
+        },
+        {
+          key: '5',
+          label: '抽奖/售后扣扣群 图片可点',
+          children: (
+            <div>
+              <h3 >售后问题/每周抽荣耀皮肤 进群</h3>
+              <Image
+                width='15em'
+                height='auto'
+                alt='扫码进群'
+                src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024813-payment-Iaw8Tr20QjXN.jpg'
+              />
+            </div>
+          )
+        },
+        {
+          key: '9',
+          label: '匹配完成',
+          children: (
+            <>
+              <Progress type="circle" percent={100} />
+              <div> 陪玩匹配完成，请点击陪陪联系方式直接联系陪陪即可 祝您游戏常胜！</div>
+            </>
+          ),
+        },
+      ]
+    } else {
+      item = [
+        {
+          key: '1',
+          label: '陪玩匹配中',
+          children: (
+            <>
+              <Progress type="circle" percent={75} />
+              <div> 陪玩匹配中， 请稍等，匹配完成将显示陪玩联系方式</div>
+            </>
+          ),
+        },
+        {
+          key: '5',
+          label: '对接扣扣群 图片可点 ',
+          children: (
+            <div>
+              <h3 >售后问题/每周抽荣耀皮肤 进群</h3>
+              <Image
+                width='15em'
+                height='auto'
+                alt='扫码进群'
+                src='http://play-list-for-pic.oss-cn-hangzhou.aliyuncs.com/2024813-payment-Iaw8Tr20QjXN.jpg'
+              />
+            </div>
+          )
+        },
+      ]
+    }
+
+    setConnectMan(item)
+  }
+
+
+  const getData = async (query, cb = () => { }) => {
+    setLoading(true);
     let params = {
-      skip,
-      limit
+      skip: 0,
+      limit: 10
     };
 
     if (query !== undefined) {
       params = { ...query, ...params };
     }
-
     // 构建查询字符串
     const queryString = new URLSearchParams(params).toString();
 
     try {
       const response = await fetch(`${pathServer}/get_create_orderlist?${queryString}`);
       const res = await response.json();
-
-      console.log('res ', res);
-
       // 更新状态
       setLoading(false);
-
-      return {
-        data: res.data,
-        total: res.total
-      };
+      cb(res.data[0].order_status)
+      return res;
     } catch (error) {
       setLoading(false);
-      console.error('获取失败', error);
       message.error('获取失败');
       // 处理错误情况，比如可以返回一个空对象或其他合适的默认值
+      console.log('error')
       return {
         data: [],
         total: 0
@@ -131,8 +208,9 @@ const FormPage = () => {
     }
   };
 
-  const [loading, setLoading] = useState([]);// 页面数据
-  const [pageStatus, setPageStatus] = useState(orderStatus.unSubmitted);// 页面数据
+  const [loading, setLoading] = useState(false);// 页面数据
+  const [pageStatus, setPageStatus] = useState();// 页面数据
+  const [connectMan, setConnectMan] = useState([]);// 匹配到的详情
 
   const updateFetch = async (filter, updateDoc, cbFun = () => { }) => {
     console.log('filter', filter, 'updateDoc', updateDoc)
@@ -170,7 +248,6 @@ const FormPage = () => {
     })
 
     // 这里可以处理表单提交的逻辑
-
   };
 
   const handleCopyClick = () => {
@@ -207,13 +284,6 @@ const FormPage = () => {
         children: `${order_id}`,
       },
       {
-        key: '5',
-        label: '订单状态',
-        children: <>
-          {order_status === orderStatus.Assigned ? <Badge status="success" text="匹配完成" /> : <Badge status="processing" text="匹配陪玩中" />}
-        </>,
-      },
-      {
         key: '2',
         label: '陪玩/代练项目',
         children: `${project}`,
@@ -233,7 +303,7 @@ const FormPage = () => {
             pageStatus === orderStatus.unSubmitted &&
             <>
               <div style={{ padding: '20px' }}>
-                <Header style={{ backgroundColor: '#ffffff', padding: '5px', fontSize:'1rem',fontWeight:'bold', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.4)' }}>
+                <Header style={{ backgroundColor: '#ffffff', padding: '5px', fontSize: '1rem', fontWeight: 'bold', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.4)' }}>
                   <div >Icon游戏俱乐部订单信息</div>
                 </Header>
                 <Form
@@ -346,18 +416,17 @@ const FormPage = () => {
                       // borderRadius
                       items={descriptionsDetailForMe}
                     />
-                    <Alert message="操作步骤： 第一：点击右上角 ”一键复制对接信息“按钮 ，第二步扫qq群码进去粘贴内容对接完成！" type="success" />
-                    <Alert message="王者技术陪规则：陪玩固定局数，输且非mvp送一局上星代练" type="info" />
-
+                    {pageStatus === orderStatus.submitted && <Alert message="您的陪玩正在匹配中，一般需要10 - 15分钟左右，匹配完成下方会显示陪陪联系信息哦" type="info" />}
+                    {pageStatus === orderStatus.Assigned && <Alert message="如何联系陪玩：下方显示陪玩联系方式，通过联系方式可以联系到您的陪陪哦" type="success" />}
+                    {pageStatus === orderStatus.Assigned && <Alert message="技术陪规则：固定陪玩您下单的局数，如果输了陪陪非mvp送您一局代练" type="info" />}
                     <Descriptions
-                      title="对接陪玩信息(下方)"
+                      title="对接陪玩信息(下方 点击均可复制)"
                       size='small'
                       // extra={<Button type="primary">Edit</Button>}
                       bordered
                       // borderRadius
                       items={connectMan}
                     />
-
                   </Content>
                 </Flex>
 

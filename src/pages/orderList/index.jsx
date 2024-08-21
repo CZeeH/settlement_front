@@ -24,14 +24,18 @@ const info = () => {
 const App = () => {
   const [isModalOpen, setIsModalOpen] = useState(false); // 新建弹窗
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false); // 链接复制弹窗
+  const [isTokenModalOpen, setIsTokenModalOpen] = useState(false); // 凭证弹窗
   const [listData, setlistData] = useState([]); // 页面数据
   const [modalDetail, setModaDetail] = useState([]);  // 链接弹窗里面的数据
   const [copyUrl, setCopyUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [pageTotals, setPageTotals] = useState(10);
   const [pageCurrent, setPageCurrent] = useState(1);
+  const [newToken, setNewToken] = useState(''); //页面loading
   const [form] = Form.useForm();
   const [pageForm] = Form.useForm();
+  const [tokenForm] = Form.useForm();
+
   useEffect(() => {
     getListData()
     const intervalId = setInterval(() => {
@@ -46,7 +50,7 @@ const App = () => {
   }
   const handleCopyDeatil = (data) => {
     const formattedText = `
-    【接单后先对接老板】老板在qq群，qq群：885967844\n
+    【接单后先对接老板】通过联系qq或者王者对接老板，联系不到喊客服
     
     [区服]:${data.origin}\n
     [游戏项目]:${data.project}\n
@@ -56,7 +60,6 @@ const App = () => {
     [老板备注]:${data.remark}\n
     [老板qq]:${data.qq_number}\n
     
-
     接单注意事项：非mvp主动联系老板上号代练
     `;
 
@@ -245,7 +248,7 @@ const App = () => {
   /** 新建订单表格提交 数据收集 数据上传 调用 */
   const onFinish = async (values) => {
     console.log('Success:', values);
-    const data = { ...values, add_time: Date.now() }
+    const data = { ...values, add_time: Date.now(), order_status: order_status.unSubmitted }
     creatFetch(data)
   };
   /** 新建订单发起请求 */
@@ -356,6 +359,35 @@ const App = () => {
     form.setFieldValue('order_id', text)
   }
 
+  const generateToken = () => {
+    setIsTokenModalOpen(true)
+  }
+
+  const tokenOnFinish = () => {
+    const param = form.getFieldsValue(true)
+    createToken(param)
+  }
+
+  const createToken = async (param) => {
+    // jCOUmJ4ehI-hJWKbe
+    // cu0Jc9PXA7-eCYHzE
+    setLoading(true)
+    try {
+      const queryString = new URLSearchParams(param).toString();
+      const response = await fetch(`${pathServer}/create_get_order_token?${queryString}`)
+      const res = await response.json()
+      if (res.success) {
+        console.log(res, res.get_order_token)
+        setNewToken(res.get_order_token)
+        setLoading(false)
+      }
+      // setLoading(false)
+    } catch (error) {
+      setLoading(false)
+      message.error(error)
+    }
+  }
+
   return (
     <Layout style={layoutStyle}>
       <Header style={headerStyle}>
@@ -401,6 +433,7 @@ const App = () => {
             {/* <Col span={24}></Col> */}
             <Col xs={6} sm={8} md={4} lg={2} xl={2}><Button type="primary" onClick={openModal}>新建</Button></Col>
             <Col xs={6} sm={8} md={4} lg={2} xl={2}> <Button onClick={() => { getListData() }}>刷新</Button></Col>
+            <Col xs={6} sm={8} md={4} lg={2} xl={2}> <Button onClick={() => { generateToken() }}>凭证</Button></Col>
           </Row>
         </Form>
       </Header>
@@ -506,6 +539,66 @@ const App = () => {
               extra={<Button type="primary" onClick={() => { handleCopyClick(copyUrl) }}>一键复制链接</Button>}
               items={modalDetail}
             />
+          </Modal>
+          <Modal
+            title="凭证创建"
+            open={isTokenModalOpen}
+            onOk={() => {
+              setIsTokenModalOpen(false)
+            }}
+            okText='关闭'
+            cancelText='取消'
+            onCancel={() => { setIsTokenModalOpen(false) }}
+            clearOnDestroy
+          >
+            <Form
+              name="basic"
+              form={tokenForm}
+              onFinish={tokenOnFinish}
+              onFinishFailed={() => { }}
+              autoComplete="off"
+            >
+              <Col span={12}>
+                <Form.Item
+                  label="qq（接单/派单人）"
+                  name="work_qq"
+                  rules={[
+                    {
+                      required: true,
+                      message: '请输入正确的qq',
+                    }
+                  ]}
+                  // wrapperCol={{
+                  //     span: 21,
+                  // }}
+                  style={{ margin: '0 auto' }}
+                >
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  label="微信（接单/派单人）"
+                  name="work_wx"
+                  rules={[
+                    {
+                      required: true,
+                      message: '请输入正确的wx',
+                    }
+                  ]}
+                >
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={4}> <Button type="primary" onClick={() => { tokenOnFinish() }}>生成凭证</Button></Col>
+              <Col span={4}><Button onClick={() => { handleCopyClick(`
+                你的凭证是： ${newToken}\n
+                请保存好你的凭证，后续将关联结算哦\n
+                接单大厅地址：http://47.99.132.17:3889/#/take_order  \n
+                【进入接单大厅后，输入凭证即可自助接单哦 随时接单更方便】
+                `
+                ) }}>{newToken || '生成后可以点击我复制'}</Button> </Col>
+            </Form>
           </Modal>
           <Table
             columns={columns}

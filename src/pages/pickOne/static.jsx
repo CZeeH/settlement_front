@@ -33,9 +33,9 @@ const items = [
   Assigned: 匹配完成
   */
 const orderStatus = {
+  wrongCode: '0', // key没有输入或者输入错误，显示提示页面
   unSubmitted: '1', // 未提交信息，表单页面
   submitted: '2', // 提交信息了 匹配页面 就是 unAssigned
-  wrongCode: '0', // key没有输入或者输入错误，显示提示页面
   Assigned: '3'
 }
 
