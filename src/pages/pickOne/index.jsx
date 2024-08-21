@@ -287,7 +287,6 @@ const FormPage = () => {
                     label="备注"
                     name="remark"
                     tooltip="如需指定男女等 无特别要求可以不填"
-
                     rules={[{ required: false, message: '请选择陪玩项目!' }]}
                   >
                     <Input placeholder="我不需要指定" />
@@ -295,7 +294,7 @@ const FormPage = () => {
                   <Form.Item
                     label="qq号码"
                     name="qq_number"
-                    tooltip='陪陪会通过qq跟您确认服务内容'
+                    tooltip='[确保扣扣可以被陪陪添加哦 陪陪才可以找到您]'
                     rules={[{ required: true, message: '请输入qq号!' }]}
                   >
                     <Input placeholder="qq号" />

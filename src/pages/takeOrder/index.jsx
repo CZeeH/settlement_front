@@ -39,7 +39,21 @@ const App = () => {
     //   getListData()
     // }, 60000); // 60000 毫秒 = 1 分钟
     // return () => clearInterval(intervalId);
+    const get_order_token = localStorage.getItem("icon_take_token");
+    if (get_order_token) {
+      checkTokenFetch({ get_order_token: get_order_token }, (data) => {
+        setToken({ get_order_token, ...data })
+        getListData()
+        setIsModalOpen(false)
+        // const intervalId = setInterval(() => {
+        //   getListData()
+        // }, 60000); // 60000 毫秒 = 1 分钟
+      })
+    }
   }, [])
+  const checkToken = () => {
+
+  }
 
   const updateFetch = async (filter, updateDoc, cbFun = () => { }) => {
     setLoading(true)
@@ -115,7 +129,7 @@ const App = () => {
         <Space size="middle">
           <Popconfirm
             title="接单确认"
-            description={`确定订单：${record.project}\n${record.origin}\n备注：${record.remark === undefined ? '' : record.remark}`}
+            description={`确定订单：${record.project}\n${record.origin}\n${record.game_level}\n备注：${record.remark === undefined ? '' : record.remark}`}
             onConfirm={() => { onClickgetOrder(record) }}
             onCancel={() => { }}
             okText="立即抢单"
@@ -125,7 +139,11 @@ const App = () => {
               接单
             </Button>
           </Popconfirm>
-
+          <Button onClick={()=>{
+            handleCopy2(record)
+          }}>
+            详情
+          </Button>
         </Space>
       ),
     },
@@ -306,7 +324,9 @@ const App = () => {
 
   const onFinish = () => {
     const get_order_token = form.getFieldValue('get_order_token')
+
     checkTokenFetch({ get_order_token: get_order_token }, (data) => {
+      localStorage.setItem("icon_take_token", get_order_token)
       setToken({ get_order_token, ...data })
       getListData()
       setIsModalOpen(false)
@@ -385,7 +405,20 @@ const App = () => {
     `;
 
     clipboardCopy(formattedText)
-      .then(() => message.success('信息复制成功 进群对接即可'))
+      .then(() => message.success('信息复制成功 第一时间添加老板扣扣/微信'))
+      .catch(err => console.error('复制失败', err));
+  };
+
+  const handleCopy2 = (data) => {
+    const formattedText = `
+    [区服]:${data.origin}\n
+    [游戏项目]:${data.project}\n
+    [游戏段位]:${data.game_level || ''}\n
+    [备注]:${data.remark || ''}\n
+    `;
+
+    clipboardCopy(formattedText)
+      .then(() => message.success('信息复制成功'))
       .catch(err => console.error('复制失败', err));
   };
 
@@ -409,7 +442,7 @@ const App = () => {
           <Col xs={8} sm={8} md={4} lg={4} xl={4}> <div>icon接单大厅</div></Col>
           <Col xs={8} sm={8} md={4} lg={4} xl={4}> <Button type='primary' onClick={() => { getListData() }} loading={loading}>刷新</Button></Col>
           {/* <Col xs={8} sm={8} md={4} lg={4} xl={4}> <Button type='primary' onClick={() => { createToken() }}>创建凭证</Button></Col> */}
-          <Col xs={8} sm={8} md={4} lg={4} xl={4}> <Button type='primary' icon={<AccountBookTwoTone></AccountBookTwoTone>} loading={loading} onClick={() => { openMyOrder() }}>我的订单</Button></Col>
+          <Col xs={8} sm={8} md={4} lg={4} xl={4}> <Button type='primary' icon={<AccountBookTwoTone></AccountBookTwoTone>} loading={loading} onClick={() => { openMyOrder() }}>我抢到的订单</Button></Col>
         </Row>
       </Header>
       {/* <AccountBookTwoTone /> */}
@@ -417,6 +450,7 @@ const App = () => {
       <Content style={contentStyle}>
         <Spin spinning={loading}>
           <Alert message="王者技术陪规则：陪玩固定局数，输且非mvp送一局上星代练 【禁止陪玩多陪】" type="info" />
+          <Alert message="接单后订单就是你的，尽快联系老板，弃单/炸单罚款对应单子金额" type="error" />
           <Table
             columns={columns}
             dataSource={listData}
