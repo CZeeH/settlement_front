@@ -25,8 +25,10 @@ const App = () => {
   const [isModalOpen, setIsModalOpen] = useState(false); // 新建弹窗
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false); // 链接复制弹窗
   const [isTokenModalOpen, setIsTokenModalOpen] = useState(false); // 凭证弹窗
+  const [isTakeOrderModalOpen, setTakeOrderModalOpen] = useState(false); // 接单弹窗
   const [listData, setlistData] = useState([]); // 页面数据
   const [modalDetail, setModaDetail] = useState([]);  // 链接弹窗里面的数据
+  const [takeOrderModalDetail, setTakeOrderModalDetail] = useState({});  // 链接弹窗里面的数据
   const [copyUrl, setCopyUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [pageTotals, setPageTotals] = useState(10);
@@ -35,12 +37,13 @@ const App = () => {
   const [form] = Form.useForm();
   const [pageForm] = Form.useForm();
   const [tokenForm] = Form.useForm();
+  const [takeOrderForm] = Form.useForm();
 
   useEffect(() => {
     getListData()
     const intervalId = setInterval(() => {
       getListData()
-    }, 60000); // 60000 毫秒 = 1 分钟
+    }, 750000); // 60000 毫秒 = 1 分钟
     return () => clearInterval(intervalId);
   }, [])
   const handleCopyClick = (text) => {
@@ -97,11 +100,14 @@ const App = () => {
       })
   }
 
-  const handleFinishAssign = (id) => {
-    updateFetch({ order_id: id }, { order_status: order_status.Assigned }, () => { getListData() })
+  const handleFinishAssign = (record) => {
+    console.log('record',record)
+    setTakeOrderModalDetail(record)
+    setTakeOrderModalOpen(true)
   }
 
-  const getTextColor = (value) => {
+  const getTextColor = (record) => {
+    const value  = record.order_status
     let color = {}
     switch (value) {
       case (order_status.Assigned):
@@ -111,7 +117,7 @@ const App = () => {
         color = { color: '#3875f6' };
         break;
       case (order_status.unSubmitted):
-        color = { color: 'red' };
+        color = { color: 'black' };
         break;
       default:
         color = { color: 'black' };
@@ -133,10 +139,10 @@ const App = () => {
         return (
           <>
             <CopyToClipboard text={v} onCopy={info}>
-              <Button type="text" style={getTextColor(record.order_status)}>{v}</Button>
+              <Button type="text" style={getTextColor(record)}>{v}</Button>
             </CopyToClipboard>
             {record.game_id !== undefined && <CopyToClipboard text={record.game_id} onCopy={info}>
-              <Button type="text" style={getTextColor(record.order_status)}>游戏id:{record.game_id}</Button>
+              <Button type="text" style={getTextColor(record)}>游戏id:{record.game_id}</Button>
             </CopyToClipboard>}
           </>
 
@@ -144,7 +150,7 @@ const App = () => {
       }
     },
     {
-      title: '订单状态',
+      title: '订单状态/接单微信',
       dataIndex: 'order_status',
       key: 'order_status',
       render: (v, record) => {
@@ -161,11 +167,11 @@ const App = () => {
           case order_status.Assigned:
             return (
               <>
-                <Tag icon={<CheckCircleOutlined />} color="success">订单分配完毕</Tag>
+                <Tag icon={<CheckCircleOutlined />} color="success">订单匹配完成</Tag>
 
                 {record.work_wx === undefined ? <Tag color="success">{record.project}</Tag> : (
                   <CopyToClipboard text={record.work_wx} onCopy={info}>
-                    <Button type="text" style={getTextColor(record.order_status)}>{record.work_wx}</Button>
+                    <Button type="primary" >{record.work_wx}</Button>
                   </CopyToClipboard>)
                 }
 
@@ -200,7 +206,7 @@ const App = () => {
           } onClick={() => { handleCopyDeatil(record) }}>详情</Button>}
           {record.order_status === order_status.unAssigned && (
             <>
-              <Button type='primary' onClick={() => { handleFinishAssign(record.order_id) }}>匹配完成</Button>
+              <Button type='primary' onClick={() => { handleFinishAssign(record) }}>匹配</Button>
             </>
           )}
           <Button onClick={() => { handleCopyClick(record.random_url) }}>
@@ -247,7 +253,6 @@ const App = () => {
   }
   /** 新建订单表格提交 数据收集 数据上传 调用 */
   const onFinish = async (values) => {
-    console.log('Success:', values);
     const data = { ...values, add_time: Date.now(), order_status: order_status.unSubmitted }
     creatFetch(data)
   };
@@ -269,7 +274,6 @@ const App = () => {
           setLoading(false)
           setIsDetailModalOpen(true)
           const { order_id, random_url, project } = { ...data, ...res }
-          console.log('random_url', random_url)
           setCopyUrl(random_url)
           setModaDetail([
             {
@@ -335,7 +339,7 @@ const App = () => {
   const search = () => {
     const param = pageForm.getFieldsValue(true)
     console.log('param', param, pageTotals)
-    getListData(param, (pageCurrent - 1) * 10)
+    getListData(param)
     // message.success('暂未开放')
   }
 
@@ -386,6 +390,19 @@ const App = () => {
       setLoading(false)
       message.error(error)
     }
+  }
+
+  const handleTakeOrderOk = () =>{
+    takeOrderForm.submit()
+  }
+
+  const onTakeOrderFinish = () =>{
+    const params = takeOrderForm.getFieldsValue(true)
+    console.log(params,)
+    updateFetch({ order_id: takeOrderModalDetail.order_id,order_status:order_status.unAssigned }, { order_status: order_status.Assigned,...params }, () => { 
+      getListData()
+      setTakeOrderModalOpen(false)
+    })
   }
 
   return (
@@ -440,7 +457,59 @@ const App = () => {
       <Content style={contentStyle}>
         <Spin spinning={loading}>
 
-
+        <Modal title="匹配陪玩（下方填一个就行）"
+            open={isTakeOrderModalOpen}
+            onOk={() => {
+              handleTakeOrderOk()
+            }}
+            onCancel={() => {
+              setTakeOrderModalOpen(false)
+            }}
+            okText='匹配完成'
+            cancelText='取消'
+            clearOnDestroy
+            confirmLoading={loading}
+          >
+            <Form
+              name="takeOrder"
+              labelCol={{
+                span: 8,
+              }}
+              wrapperCol={{
+                span: 16,
+              }}
+              form={takeOrderForm}
+              onFinish={onTakeOrderFinish}
+              onFinishFailed={onFinishFailed}
+              autoComplete="off"
+            >
+                <Form.Item
+                  label="接单人凭证"
+                  name="get_order_token"
+                  rules={[
+                    {
+                      required: false,
+                      message: '请输入正确的接单凭证',
+                      pattern: /^\w{10}-\w{6}$/
+                    }
+                  ]}
+                >
+                  <Input />
+                </Form.Item>
+                <Form.Item
+                  label="接单人微信"
+                  name="work_wx"
+                  rules={[
+                    {
+                      required: false,
+                      message: '请输入正确的微信号',
+                    }
+                  ]}
+                >
+                  <Input />
+                </Form.Item>
+            </Form>
+          </Modal>
           <Modal title="新建订单"
             open={isModalOpen}
             onOk={() => {
