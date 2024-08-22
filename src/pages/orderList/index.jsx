@@ -16,6 +16,7 @@ import clipboardCopy from 'clipboard-copy';
 
 const { Header, Footer, Sider, Content } = Layout;
 const regex = /^\d{6}-\d{15}$/
+const jiedanPath = 'http://47.99.132.17:3889/#/take_order'
 const info = () => {
   message.success('复制成功')
 }
@@ -53,6 +54,7 @@ const App = () => {
   }
   const handleCopyDeatil = (data) => {
     const formattedText = `
+    
     【接单后先对接老板】通过联系qq或者王者对接老板，联系不到喊客服
     
     [区服]:${data.origin}\n
@@ -64,6 +66,7 @@ const App = () => {
     [老板qq]:${data.qq_number}\n
     
     接单注意事项：非mvp主动联系老板上号代练
+    更多未接订单：${jiedanPath}
     `;
 
     clipboardCopy(formattedText)
