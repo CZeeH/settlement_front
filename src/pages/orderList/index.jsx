@@ -371,13 +371,14 @@ const App = () => {
   }
 
   const tokenOnFinish = () => {
-    const param = form.getFieldsValue(true)
+    const param = tokenForm.getFieldsValue(true)
+    console.log(param)
     createToken(param)
   }
 
   const createToken = async (param) => {
-    // jCOUmJ4ehI-hJWKbe
-    // cu0Jc9PXA7-eCYHzE
+    // jCOUmJ4ehI-hJWKbe  
+    // cu0Jc9PXA7-eCYHzE     
     setLoading(true)
     try {
       const queryString = new URLSearchParams(param).toString();
