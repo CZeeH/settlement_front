@@ -257,8 +257,7 @@ const App = () => {
   /** 新建订单表格提交 数据收集 数据上传 调用 */
   const onFinish = async (values) => {
     const data = { ...values, add_time: Date.now(), order_status: order_status.unSubmitted }
-    console.log(data)
-    // creatFetch(data)
+    creatFetch(data)
   };
   /** 新建订单发起请求 */
   const creatFetch = (data) => {
