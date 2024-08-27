@@ -104,13 +104,13 @@ const App = () => {
   }
 
   const handleFinishAssign = (record) => {
-    console.log('record',record)
+    console.log('record', record)
     setTakeOrderModalDetail(record)
     setTakeOrderModalOpen(true)
   }
 
   const getTextColor = (record) => {
-    const value  = record.order_status
+    const value = record.order_status
     let color = {}
     switch (value) {
       case (order_status.Assigned):
@@ -257,7 +257,8 @@ const App = () => {
   /** 新建订单表格提交 数据收集 数据上传 调用 */
   const onFinish = async (values) => {
     const data = { ...values, add_time: Date.now(), order_status: order_status.unSubmitted }
-    creatFetch(data)
+    console.log(data)
+    // creatFetch(data)
   };
   /** 新建订单发起请求 */
   const creatFetch = (data) => {
@@ -396,17 +397,21 @@ const App = () => {
     }
   }
 
-  const handleTakeOrderOk = () =>{
+  const handleTakeOrderOk = () => {
     takeOrderForm.submit()
   }
 
-  const onTakeOrderFinish = () =>{
+  const onTakeOrderFinish = () => {
     const params = takeOrderForm.getFieldsValue(true)
     console.log(params,)
-    updateFetch({ order_id: takeOrderModalDetail.order_id,order_status:order_status.unAssigned }, { order_status: order_status.Assigned,...params }, () => { 
+    updateFetch({ order_id: takeOrderModalDetail.order_id, order_status: order_status.unAssigned }, { order_status: order_status.Assigned, ...params }, () => {
       getListData()
       setTakeOrderModalOpen(false)
     })
+  }
+
+  const setProject = (num) => {
+    form.setFieldValue('project',['王者荣耀', '技术陪', `${num}局`])
   }
 
   return (
@@ -461,7 +466,7 @@ const App = () => {
       <Content style={contentStyle}>
         <Spin spinning={loading}>
 
-        <Modal title="匹配陪玩（下方填一个就行）"
+          <Modal title="匹配陪玩（下方填一个就行）"
             open={isTakeOrderModalOpen}
             onOk={() => {
               handleTakeOrderOk()
@@ -487,31 +492,31 @@ const App = () => {
               onFinishFailed={onFinishFailed}
               autoComplete="off"
             >
-                <Form.Item
-                  label="接单人凭证"
-                  name="get_order_token"
-                  rules={[
-                    {
-                      required: false,
-                      message: '请输入正确的接单凭证',
-                      pattern: /^\w{10}-\w{6}$/
-                    }
-                  ]}
-                >
-                  <Input />
-                </Form.Item>
-                <Form.Item
-                  label="接单人微信"
-                  name="work_wx"
-                  rules={[
-                    {
-                      required: false,
-                      message: '请输入正确的微信号',
-                    }
-                  ]}
-                >
-                  <Input />
-                </Form.Item>
+              <Form.Item
+                label="接单人凭证"
+                name="get_order_token"
+                rules={[
+                  {
+                    required: false,
+                    message: '请输入正确的接单凭证',
+                    pattern: /^\w{10}-\w{6}$/
+                  }
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                label="接单人微信"
+                name="work_wx"
+                rules={[
+                  {
+                    required: false,
+                    message: '请输入正确的微信号',
+                  }
+                ]}
+              >
+                <Input />
+              </Form.Item>
             </Form>
           </Modal>
           <Modal title="新建订单"
@@ -566,23 +571,30 @@ const App = () => {
                 <Button onClick={() => { generateRandomOrderId() }}>随机创建</Button>
               </Form.Item>
 
-
               <Form.Item
                 label="项目"
-                name="project"
-                wrapperCol={{
-                  span: 14,
-                }}
-                rules={[
-                  {
-                    required: true,
-                    message: '请选择游戏项目',
-                  },
-                ]}
               >
-                <Cascader
-                  options={projectData}
-                />
+                <Form.Item
+                  name="project"
+                  wrapperCol={{
+                    span: 20,
+                  }}
+                  rules={[
+                    {
+                      required: true,
+                      message: '请选择游戏项目',
+                    },
+                  ]}
+                >
+                  <Cascader
+                    options={projectData}
+                  />
+                </Form.Item>
+                <Button onClick={() => { setProject(2) }}>2技</Button>
+                <Button onClick={() => { setProject(3) }}>3技</Button>
+                <Button onClick={() => { setProject(4) }}>4技</Button>
+                <Button onClick={() => { setProject(5) }}>5技</Button>
+                <Button onClick={() => { setProject(7) }}>7技</Button>
               </Form.Item>
               {/* <Form.Item
               wrapperCol={{
@@ -635,6 +647,7 @@ const App = () => {
                 <Form.Item
                   label="qq（接单/派单人）"
                   name="work_qq"
+                  getValueFromEvent={(e) => e.target.value.replace(/(^\s*)|(\s*$)/g, '')}
                   rules={[
                     {
                       required: true,
@@ -664,13 +677,15 @@ const App = () => {
                 </Form.Item>
               </Col>
               <Col span={4}> <Button type="primary" onClick={() => { tokenOnFinish() }}>生成凭证</Button></Col>
-              <Col span={4}><Button onClick={() => { handleCopyClick(`
+              <Col span={4}><Button onClick={() => {
+                handleCopyClick(`
                 你的凭证是： ${newToken}\n
                 请保存好你的凭证，后续将关联结算哦\n
                 接单大厅地址：http://47.99.132.17:3889/#/take_order  \n
                 【进入接单大厅后，输入凭证即可自助接单哦 随时接单更方便】
                 `
-                ) }}>{newToken || '生成后可以点击我复制'}</Button> </Col>
+                )
+              }}>{newToken || '生成后可以点击我复制'}</Button> </Col>
             </Form>
           </Modal>
           <Table

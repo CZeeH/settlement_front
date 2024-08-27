@@ -533,6 +533,7 @@ const App = () => {
             label="接单凭证"
             name="get_order_token"
             tooltip="跟客服或者团长77申请"
+            getValueFromEvent={(e) => e.target.value.replace(/(^\s*)|(\s*$)/g, '')}
             rules={[
               {
                 required: true,

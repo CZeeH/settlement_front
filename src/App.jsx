@@ -7,6 +7,7 @@ import OrderList from './pages/orderList/index';
 import CheckSettlement from './pages/checkSettlement/index'
 import TakeOrder from './pages/takeOrder/index'
 import TokenManage from './pages/tokenManage/index'
+import MoneyManage from './pages/moneyManage/index'
 import './App.css';
 
 const App = () => {
@@ -18,6 +19,7 @@ const App = () => {
         <Route path="/order_list" element={<OrderList />} />
         <Route path="/take_order" element={<TakeOrder />} />
         <Route path="/pick" element={<PickOne />} />
+        <Route path="/money_manage" element={<MoneyManage />} />
         <Route path="/token_manage" element={<TokenManage />} />
         <Route path="/" element={<AddSettlement />} />
         <Route path="*" element={<NotFound />} />

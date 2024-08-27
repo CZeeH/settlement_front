@@ -17,41 +17,44 @@ const info = () => {
 const FormPage = () => {
   const location = useLocation();
   /**检查是否有key 对应好订单 确定状态 */
-  const checkCode = async () => {
-    // 从 URL 中获取 key 参数
-    const { key } = queryString.parse(location.search); // 解析查询参数
-    if (key === undefined) {
-      setPageStatus(orderStatus.wrongCode)
-      return
+  const checkCode = async (id) => {
+    let res = {}
+    if(!id){
+      const { key } = queryString.parse(location.search); // 解析查询参数
+      if (key === undefined) {
+        setPageStatus(orderStatus.wrongCode)
+        return
+      }
+       res = await getData({ random_string: key }, (status) => {
+        setConnect(status)
+      })
+    } else {
+      console.log('id == >',id)
+      res = await getData({ order_id: id }, (status) => {
+        setConnect(status)
+      })
     }
-    const res = await getData({ random_string: key }, (status) => {
-      setConnect(status)
-    })
     const { total, data } = res
-    console.log(res)
     // key 错误
     if (Number(total) === 0) {
-      console.log(Number(total), total)
       setPageStatus(orderStatus.wrongCode)
       return
     }
     setData(data[0])
-    //  unSubmitted
-    if (data[0].order_status === undefined) {
-      setPageStatus(orderStatus.unSubmitted)
-      return
-    }
-
     //  Assigned && submitted
     setPageStatus(data[0].order_status)
     formatDescription(data[0])
     if (data[0].order_status === orderStatus.Assigned) {
       return
     }
+
+    if (data[0].order_status === orderStatus.submitted) {
+      const intervalId = setInterval(() => {
+        checkStatus()
+      }, 60000); // 60000 毫秒 = 1 分钟
+      return
+    }
     // 有 submitted
-    const intervalId = setInterval(() => {
-      checkStatus()
-    }, 60000); // 60000 毫秒 = 1 分钟
   }
   const [data, setData] = useState({});// 页面数据
   const [descriptionsDetailForMe, setDescriptionsDetailForMe] = useState({});// 订单信息
@@ -62,9 +65,10 @@ const FormPage = () => {
 
   const checkStatus = async () => {
     const newData = await getData({ order_id: data.order_id }, (status) => {
-      setConnect(status)
+      if (status !== data.order_status) {
+        setConnect(status)
+      }
     })
-    console.log('ing ', newData)
     setData(newData[0])
     if (newData[0].order_status === orderStatus.Assigned) {
       clearInterval(intervalId)
@@ -243,8 +247,8 @@ const FormPage = () => {
   }
 
   const onFinish = (values) => {
-    updateFetch({ order_id: data.order_id }, { assign_time: (new Date()).toLocaleString(), ...values, order_status: orderStatus.submitted }, () => {
-      checkCode()
+    updateFetch({ order_id: data.order_id }, { order_status: orderStatus.submitted, assign_time: (new Date()).toLocaleString(), ...values }, () => {
+      checkCode(data.order_id)
     })
 
     // 这里可以处理表单提交的逻辑

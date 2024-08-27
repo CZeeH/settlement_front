@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Button, Form, Input, Flex, Popover, Layout, Cascader, Upload, Space, Modal, Alert } from 'antd';
+import React, { useState,useEffect } from 'react';
+import { Button, Form, Input, Flex, message, Layout, Cascader, Upload, Space, Modal, Alert } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { contentStyle, headerStyle, layoutStyle, footerStyle, titleStyle, projectData } from './static'
 
@@ -10,8 +10,22 @@ import { pathServer } from '../../common'
 
 const App = () => {
     const [fileList, setFileList] = useState([]);
-    const [loading, setLoding] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(true); // 新建弹窗
     const [form] = Form.useForm();
+    const [token, setToken] = useState(); // 接单凭证
+    const [formToken] = Form.useForm();
+
+    useEffect(() => {
+        const get_order_token = localStorage.getItem("icon_take_token");
+        if (get_order_token) {
+          checkTokenFetch({ get_order_token: get_order_token }, (data) => {
+            setToken({ get_order_token, ...data })
+            setIsModalOpen(false)
+          })
+        }
+      }, [])
+
     const handleChange = ({ fileList: newFileList }) => {
         setFileList(newFileList)
     }
@@ -36,7 +50,7 @@ const App = () => {
     const onFinish = async (values) => {
         console.log('values', values)
         const settlementMsg = { ...values, payment_picture: values.payment_picture.file.response.fileurl, isPay: '0', add_time: Date.now() }
-        setLoding(true)
+        setLoading(true)
         fetch(`${pathServer}/submit`, {
             method: 'POST',
             headers: {
@@ -49,27 +63,66 @@ const App = () => {
                     Modal.success({
                         content: res.msg
                     })
-                    setLoding(false)
+                    setLoading(false)
                     form.resetFields()
                     setFileList([])
                 } else {
                     Modal.error({
                         content: res.msg
                     })
-                    setLoding(false)
+                    setLoading(false)
                 }
             })
             .catch(error => Modal.error({
                 content: error
             }));
     };
+    /** modal完成处理 表格提交 反馈 */
+    const handleOk = () => {
+        formToken.submit()
+    }
+    /** modal主动关闭  */
+    const handleCancel = () => {
+        if (token) {
+            setIsModalOpen(false)
+        } else {
+            message.error('请验证凭证')
+        }
+    }
 
     const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
     };
+    const checkTokenFetch = async (params, cb) => {
+        setLoading(true)
+        try {
+            const queryString = new URLSearchParams(params).toString();
+            const response = await fetch(`${pathServer}/check_order_token?${queryString}`)
+            const res = await response.json()
+            if (res.success) {
+                cb(res.data[0])
+            }
+            message.success(res.msg)
+            setLoading(false)
+        } catch (error) {
+            setLoading(false)
+            message.error(error)
+        }
+    }
+
+    const onTokenFinish = () => {
+        const get_order_token = formToken.getFieldValue('get_order_token')
+
+        checkTokenFetch({ get_order_token: get_order_token }, (data) => {
+            localStorage.setItem("icon_take_token", get_order_token)
+            setToken({ get_order_token, ...data })
+            setIsModalOpen(false)
+        })
+    }
 
     return (
         <>
+
             <Flex gap="middle" wrap >
                 <Layout style={layoutStyle}>
                     <Header style={headerStyle}>
@@ -129,19 +182,19 @@ const App = () => {
                                     options={projectData}
                                 />
                             </Form.Item>
-                                <Form.Item
-                                    label="报酬"
-                                    name="price"
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: '请输入对应报酬(数字)',
-                                            pattern: /^\d+(\.\d{1,2})?$/
-                                        },
-                                    ]}
-                                >
-                                    <Input />
-                                </Form.Item>
+                            <Form.Item
+                                label="报酬"
+                                name="price"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: '请输入对应报酬(数字)',
+                                        pattern: /^\d+(\.\d{1,2})?$/
+                                    },
+                                ]}
+                            >
+                                <Input />
+                            </Form.Item>
                             <Form.Item
                                 label="收款码"
                                 name="payment_picture"
@@ -204,9 +257,59 @@ const App = () => {
                     <Footer style={footerStyle}>Footer</Footer>
                 </Layout>
             </Flex>
+            <Modal title="凭证验证"
+                open={isModalOpen}
+                onOk={() => {
+                    handleOk()
+                }}
+                onCancel={() => {
+                    handleCancel()
+                }}
+                okText='验证凭证'
+                cancelText='验证凭证后可抢单'
+                clearOnDestroy
+                confirmLoading={loading}
+            >
 
+                <Form
+                    name="basic"
+                    initialValues={{ remember: true }}
+                    labelCol={{
+                        span: 8,
+                    }}
+                    wrapperCol={{
+                        span: 16,
+                    }}
+                    // style={{
+                    //   maxWidth: 600,
+                    // }}
+                    form={formToken}
+                    onFinish={onTokenFinish}
+                    onFinishFailed={onFinishFailed}
+                    autoComplete="off"
+                >
+                    <Form.Item
+                        label="接单凭证"
+                        name="get_order_token"
+                        tooltip="跟客服或者团长77申请"
+                        getValueFromEvent={(e) => e.target.value.replace(/(^\s*)|(\s*$)/g, '')}
+                        rules={[
+                            {
+                                required: true,
+                                message: '请输入正确的接单凭证',
+                                pattern: /^\w{10}-\w{6}$/
+                            }
+                        ]}
+                        wrapperCol={{
+                            span: 21,
+                        }}
+                        style={{ margin: '0 auto' }}
+                    >
+                        <Input />
+                    </Form.Item>
+                </Form>
+            </Modal>
         </>
-
     );
 
 }
