@@ -19,17 +19,16 @@ const FormPage = () => {
   /**检查是否有key 对应好订单 确定状态 */
   const checkCode = async (id) => {
     let res = {}
-    if(!id){
+    if (!id) {
       const { key } = queryString.parse(location.search); // 解析查询参数
       if (key === undefined) {
         setPageStatus(orderStatus.wrongCode)
         return
       }
-       res = await getData({ random_string: key }, (status) => {
+      res = await getData({ random_string: key }, (status) => {
         setConnect(status)
       })
     } else {
-      console.log('id == >',id)
       res = await getData({ order_id: id }, (status) => {
         setConnect(status)
       })
@@ -77,7 +76,7 @@ const FormPage = () => {
 
   const setConnect = (status) => {
     let item = []
-    console.log(pageStatus === orderStatus.Assigned, pageStatus)
+    // console.log('data ==>',data,data.work_wx)
     if (status === orderStatus.Assigned) {
 
       item = [
@@ -204,7 +203,6 @@ const FormPage = () => {
       setLoading(false);
       message.error('获取失败');
       // 处理错误情况，比如可以返回一个空对象或其他合适的默认值
-      console.log('error')
       return {
         data: [],
         total: 0
@@ -217,7 +215,6 @@ const FormPage = () => {
   const [connectMan, setConnectMan] = useState([]);// 匹配到的详情
 
   const updateFetch = async (filter, updateDoc, cbFun = () => { }) => {
-    console.log('filter', filter, 'updateDoc', updateDoc)
     setLoading(true)
     fetch(`${pathServer}/update_order`, {
       method: 'POST',

@@ -449,7 +449,7 @@ const App = () => {
 
       <Content style={contentStyle}>
         <Spin spinning={loading}>
-          <Alert message="接单时间少的可以推荐一个免会费伙伴进团接单 直接让他加团长：SKY-777A" type="info" />
+          <Alert message="接单时间少的可以推荐一个[免会费]伙伴进团接单 直接让他加团长：SKY-777A" type="info" />
           <Alert message="王者技术陪规则：陪玩固定局数，输且非mvp送一局上星代练 【禁止陪玩多陪】" type="info" />
           <Alert message="接单后订单就是你的，如果联系不到老板而炸单、弃单罚款【6元转77】【扣扣和王者里都联系不到老板跟客服说】" type="error" />
           <Table
