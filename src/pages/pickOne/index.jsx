@@ -16,6 +16,15 @@ const info = () => {
 
 const FormPage = () => {
   const location = useLocation();
+  const [data, setData] = useState({});// 页面数据
+  const [descriptionsDetailForMe, setDescriptionsDetailForMe] = useState({});// 订单信息
+  const [loading, setLoading] = useState(false);// 页面数据
+  const [pageStatus, setPageStatus] = useState();// 页面数据
+  const [connectMan, setConnectMan] = useState([]);// 匹配到的详情
+
+  useEffect(() => {
+    checkCode()
+  }, [])
   /**检查是否有key 对应好订单 确定状态 */
   const checkCode = async (id) => {
     let res = {}
@@ -25,12 +34,12 @@ const FormPage = () => {
         setPageStatus(orderStatus.wrongCode)
         return
       }
-      res = await getData({ random_string: key }, (status) => {
-        setConnect(status)
+      res = await getData({ random_string: key }, (init) => {
+        setConnect(init)
       })
     } else {
-      res = await getData({ order_id: id }, (status) => {
-        setConnect(status)
+      res = await getData({ order_id: id }, (init) => {
+        setConnect(init)
       })
     }
     const { total, data } = res
@@ -55,17 +64,12 @@ const FormPage = () => {
     }
     // 有 submitted
   }
-  const [data, setData] = useState({});// 页面数据
-  const [descriptionsDetailForMe, setDescriptionsDetailForMe] = useState({});// 订单信息
 
-  useEffect(() => {
-    checkCode()
-  }, [])
 
   const checkStatus = async () => {
-    const newData = await getData({ order_id: data.order_id }, (status) => {
-      if (status !== data.order_status) {
-        setConnect(status)
+    const newData = await getData({ order_id: data.order_id }, (init) => {
+      if (init.order_status !== data.order_status) {
+        setConnect(init)
       }
     })
     setData(newData[0])
@@ -74,19 +78,17 @@ const FormPage = () => {
     }
   }
 
-  const setConnect = (status) => {
+  const setConnect = (init = {}) => {
     let item = []
-    // console.log('data ==>',data,data.work_wx)
-    if (status === orderStatus.Assigned) {
-
+    if (init.order_status === orderStatus.Assigned) {
       item = [
         {
           key: '1',
           label: '陪陪联系微信',
           children: (
-            data.work_wx ? (
-              <CopyToClipboard text={data.work_wx || ''} onCopy={info}>
-                <Button type="primary" color=''>{data.work_wx || ''}</Button>
+            init.work_wx ? (
+              <CopyToClipboard text={init.work_wx || ''} onCopy={info}>
+                <Button type="primary" color=''>{init.work_wx || ''}</Button>
               </CopyToClipboard>
             ) : (
               <>
@@ -99,9 +101,9 @@ const FormPage = () => {
           key: '2',
           label: '陪陪联系qq',
           children: (
-            data.work_qq ? (
-              <CopyToClipboard text={data.work_qq || ''} onCopy={info}>
-                <Button type="primary" color=''>{data.work_qq || ''}</Button>
+            init.work_qq ? (
+              <CopyToClipboard text={init.work_qq || ''} onCopy={info}>
+                <Button type="primary" color=''>{init.work_qq || ''}</Button>
               </CopyToClipboard>
             ) : (
               <>
@@ -197,7 +199,7 @@ const FormPage = () => {
       const res = await response.json();
       // 更新状态
       setLoading(false);
-      cb(res.data[0].order_status)
+      cb(res.data[0])
       return res;
     } catch (error) {
       setLoading(false);
@@ -209,10 +211,6 @@ const FormPage = () => {
       };
     }
   };
-
-  const [loading, setLoading] = useState(false);// 页面数据
-  const [pageStatus, setPageStatus] = useState();// 页面数据
-  const [connectMan, setConnectMan] = useState([]);// 匹配到的详情
 
   const updateFetch = async (filter, updateDoc, cbFun = () => { }) => {
     setLoading(true)
