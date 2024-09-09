@@ -128,7 +128,7 @@ const App = () => {
                     <Header style={headerStyle}>
                         <div style={titleStyle}>icon订单结算</div>
                     </Header>
-                    <Alert message="7月29日之后完成的单子填这里，文档填过的不用再填，团长微信：SKY-777A，每周日周一结算" type="info" />
+                    <Alert message="团长微信：SKY-777A，一般半个月结算一次，接单多的可以喊团长每周末给你结算" type="info" />
                     <Alert message="光遇普陪：2.5元/小时 光遇三恋陪：6元/小时 王者技术陪：1.7元一把 王者娱乐陪：0.8元一把 蛋仔技术陪：4元/小时 蛋仔普陪：2元/小时" type="success" />
                     <Content style={contentStyle}>
                         <Form
@@ -185,6 +185,7 @@ const App = () => {
                             <Form.Item
                                 label="报酬"
                                 name="price"
+                                tooltip={`项目金额多少就是多少`}
                                 rules={[
                                     {
                                         required: true,
@@ -218,7 +219,7 @@ const App = () => {
                                     {fileList.length >= 1 ? null : uploadButton}
                                 </Upload>
                             </Form.Item>
-                            <Form.Item
+                            {/* <Form.Item
                                 label="详情"
                                 name="detail"
                                 rules={[
@@ -229,7 +230,7 @@ const App = () => {
                                 ]}
                             >
                                 <TextArea rows={4} />
-                            </Form.Item>
+                            </Form.Item> */}
                             <Form.Item
                                 label="备注"
                                 name="remark"
