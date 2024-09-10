@@ -441,22 +441,17 @@ const App = () => {
     <Layout style={layoutStyle}>
       <Header style={headerStyle}>
         <Row gutter={5}>
-
-
-          {/* </Row> */}
-          {/* <Row gutter={5}> */}
-          <Col xs={8} sm={8} md={4} lg={4} xl={4}> <div>icon接单大厅</div></Col>
-          <Col xs={8} sm={8} md={4} lg={4} xl={4}> <Button type='primary' onClick={() => { getListData() }} loading={loading}>刷新</Button></Col>
+          <Col offset={8}  xs={8} sm={8} md={4} lg={4} xl={4}> <div>icon接单大厅</div></Col>
+        </Row>
+        <Row gutter={5}>
+          <Col xs={6} sm={6} md={4} lg={4} xl={4}> <Button type='primary' onClick={() => { getListData() }} loading={loading}>刷新</Button></Col>
           {/* <Col xs={8} sm={8} md={4} lg={4} xl={4}> <Button type='primary' onClick={() => { createToken() }}>创建凭证</Button></Col> */}
-          <Col xs={8} sm={8} md={4} lg={4} xl={4}> <Button type='primary' icon={<AccountBookTwoTone></AccountBookTwoTone>} loading={loading} onClick={() => { openMyOrder() }}>我抢到的订单</Button></Col>
-          <Col xs={8} sm={8} md={4} lg={4} xl={4}> <Button type='primary' icon={<AccountBookTwoTone></AccountBookTwoTone>} loading={loading} onClick={() => { toSettlement() }}>结算大厅</Button></Col>
+          <Col xs={10} sm={10} md={4} lg={4} xl={4}> <Button type='primary' icon={<AccountBookTwoTone></AccountBookTwoTone>} loading={loading} onClick={() => { openMyOrder() }}>我抢到的订单</Button></Col>
+          <Col xs={8} sm={8} md={4} lg={4} xl={4}> <Button type='primary' loading={loading} onClick={() => { toSettlement() }}>结算</Button></Col>
         </Row>
       </Header>
-      {/* <AccountBookTwoTone /> */}
-
       <Content style={contentStyle}>
         <Spin spinning={loading}>
-          {/* <Alert message="接单时间少的可以推荐一个[免会费]伙伴进团接单 直接让他加团长：SKY-777A" type="info" /> */}
           <Alert message="王者技术陪规则：陪玩固定局数，输且非mvp送一局上星代练 【禁止陪玩多陪】" type="info" />
           <Alert message="接单后订单就是你的，如果联系不到老板而炸单、弃单罚款【6元转77】【扣扣和王者里都联系不到老板跟客服说】" type="error" />
           <Table

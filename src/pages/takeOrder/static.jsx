@@ -200,6 +200,7 @@ const headerStyle = {
     backgroundColor: '#fff',
     fontSize:'30px',
     fontWeight:'bolder',
+    minHeight:'120px'
 };
 const contentStyle = {
     // textAlign: 'center',
