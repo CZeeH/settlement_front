@@ -191,17 +191,17 @@ const projectData = [
 ]
 
 const headerStyle = {
-    // textAlign: 'center',
-    // color: '#fff',
     width: '100%',
-    // padding: 48,
-    margin:'10px',
-    // lineHeight: '64px',
+    margin: '10px',
     backgroundColor: '#fff',
-    fontSize:'30px',
-    fontWeight:'bolder',
-    minHeight:'120px'
+    minHeight: '100px',
 };
+
+const titleStyle = {
+    fontSize: '16px',
+    fontWeight: 'bolder',
+    height:'40px',
+}
 const contentStyle = {
     // textAlign: 'center',
     minHeight: '120px',
@@ -226,6 +226,6 @@ const layoutStyle = {
     overflow: 'hidden',
     width: 'calc(100% - 8px)',
     maxWidth: 'calc(100% - 8px)',
-    minWidth:'400px'
+    minWidth: '400px'
 };
-export { projectData, order_status, layoutStyle, footerStyle, siderStyle, contentStyle, headerStyle }
+export { projectData, order_status,titleStyle, layoutStyle, footerStyle, siderStyle, contentStyle, headerStyle }

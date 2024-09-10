@@ -3,9 +3,10 @@ import {
   Space, Table, Tag, Button, Drawer, Alert, Col, Row, Modal, Form,
   Input, Spin, Layout, message, Descriptions, Pagination, Popover, Popconfirm
 } from 'antd';
-import { order_status, layoutStyle, contentStyle, headerStyle, } from './static'
+import { order_status, layoutStyle, contentStyle, headerStyle,titleStyle } from './static'
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { pathServer } from '../../common'
+import './index.css'
 import {
   AccountBookTwoTone,
   ExclamationCircleOutlined,
@@ -441,7 +442,7 @@ const App = () => {
     <Layout style={layoutStyle}>
       <Header style={headerStyle}>
         <Row gutter={5}>
-          <Col offset={8}  xs={8} sm={8} md={4} lg={4} xl={4}> <div>icon接单大厅</div></Col>
+          <Col offset={6}  span={12}> <div style={titleStyle} className="this-div">icon接单大厅</div></Col>
         </Row>
         <Row gutter={5}>
           <Col xs={6} sm={6} md={4} lg={4} xl={4}> <Button type='primary' onClick={() => { getListData() }} loading={loading}>刷新</Button></Col>

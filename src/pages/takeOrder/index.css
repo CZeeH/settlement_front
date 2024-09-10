@@ -1,0 +1,18 @@
+
+.this-div{
+	background-image: -webkit-linear-gradient(left, #e5279f, #62b2ee 25%, #147B96 50%, #27d5c1 75%, #ff1b26);
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text;
+    -webkit-background-size: 200% 100%;
+    -webkit-animation:  maskedAnimation 4s infinite linear;
+    font-size: 18px;
+}
+ 
+@keyframes maskedAnimation {
+	0% {
+    background-position: 0 0;
+	}
+	100% {
+	    background-position: -100% 0;
+	}
+}

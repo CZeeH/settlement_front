@@ -191,13 +191,10 @@ const projectData = [
 ]
 
 const headerStyle = {
-    // textAlign: 'center',
-    // color: '#fff',
     width: '100%',
     minHeight: '200px',
     padding: 48,
     margin:'10px',
-    // lineHeight: '64px',
     backgroundColor: '#fff',
 };
 const contentStyle = {
