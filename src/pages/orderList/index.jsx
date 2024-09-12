@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Space, Table, Tag, Button, Flex, Select, Col, Row, Modal, Form, Cascader,
-  Input, Spin, Layout, message, Descriptions, Pagination, Popover
+  Input, Spin, Layout, message, Descriptions, Pagination, Popover,Alert
 } from 'antd';
 import { projectData, order_status, layoutStyle, footerStyle, siderStyle, contentStyle, headerStyle, } from './static'
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -52,9 +52,21 @@ const App = () => {
       .then(() => message.success('信息复制成功'))
       .catch(err => console.error('复制失败', err));
   }
-  const handleCopyDeatil = (data) => {
+  const handleCopyDeatil = (isAll,data) => {
+
     const formattedText = `
+    【接单后先对接老板】通过联系qq或者王者对接老板，联系不到喊客服
     
+    [区服]:${data.origin}\n
+    [游戏项目]:${data.project}\n
+    [游戏段位]:${data.game_level}\n
+    [订单号]:${data.order_id}\n
+    [老板备注]:${data.remark || ''}\n
+    
+    接单请点击：${jiedanPath}
+    `;
+
+    const formattedTextAll = `
     【接单后先对接老板】通过联系qq或者王者对接老板，联系不到喊客服
     
     [区服]:${data.origin}\n
@@ -62,14 +74,13 @@ const App = () => {
     [游戏id/名字]:${data.game_id}\n
     [游戏段位]:${data.game_level}\n
     [订单号]:${data.order_id}\n
-    [老板备注]:${data.remark}\n
+    [老板备注]:${data.remark || ''}\n
     [老板qq]:${data.qq_number}\n
     
-    接单注意事项：非mvp主动联系老板上号代练
-    更多未接订单：${jiedanPath}
+    接单请点击：${jiedanPath}
     `;
 
-    clipboardCopy(formattedText)
+    clipboardCopy(isAll ? formattedTextAll : formattedText)
       .then(() => message.success('信息复制成功 扫码进群对接即可'))
       .catch(err => console.error('复制失败', err));
   };
@@ -206,7 +217,10 @@ const App = () => {
         <Space size="middle">
           {[order_status.unAssigned, order_status.Assigned].includes(record.order_status) && <Button type={
             record.order_status === order_status.unAssigned ? 'primary' : ''
-          } onClick={() => { handleCopyDeatil(record) }}>详情</Button>}
+          } onClick={() => { handleCopyDeatil(false,record) }}>简</Button>}
+          {[order_status.unAssigned, order_status.Assigned].includes(record.order_status) && <Button type={
+            record.order_status === order_status.unAssigned ? 'primary' : ''
+          } onClick={() => { handleCopyDeatil(true,record) }}>详</Button>}
           {record.order_status === order_status.unAssigned && (
             <>
               <Button type='primary' onClick={() => { handleFinishAssign(record) }}>匹配</Button>
@@ -464,7 +478,7 @@ const App = () => {
       </Header>
       <Content style={contentStyle}>
         <Spin spinning={loading}>
-
+        <Alert message="没人接单记得私聊活跃接单的人，退单退款及时删除，派单用【简】" type="info" />
           <Modal title="匹配陪玩（下方填一个就行）"
             open={isTakeOrderModalOpen}
             onOk={() => {

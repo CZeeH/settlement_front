@@ -408,7 +408,7 @@ const App = () => {
     `;
 
     clipboardCopy(formattedText)
-      .then(() => message.success('信息复制成功 第一时间添加老板扣扣/微信'))
+      .then(() => message.success('信息复制成功 第一时间添加老板扣扣/王者id'))
       .catch(err => console.error('复制失败', err));
   };
 
