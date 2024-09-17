@@ -416,7 +416,7 @@ const FormPage = () => {
                       items={descriptionsDetailForMe}
                     />
                     {pageStatus === orderStatus.submitted && <Alert message="您的陪玩正在匹配中，一般需要10 - 15分钟左右，匹配完成下方会显示陪陪联系信息哦" type="info" />}
-                    {pageStatus === orderStatus.Assigned && <Alert message="如何联系陪玩：下方显示陪玩联系方式，通过联系方式可以联系到您的陪陪哦" type="success" />}
+                    {pageStatus === orderStatus.Assigned && <Alert message="如何联系陪玩：下方显示陪玩联系方式，通过联系方式可以联系到您的陪陪哦（陪陪如果私下收费，举报+截图奖励30元）" type="success" />}
                     {pageStatus === orderStatus.Assigned && <Alert message="技术陪规则：固定陪玩您下单的局数，如果输了陪陪非mvp送您一局代练" type="info" />}
                     <Descriptions
                       title="对接陪玩信息(下方 点击均可复制)"
